@@ -1,5 +1,6 @@
 // This header contains some useful functions for debugging OpenGL.
 // Remember to disable them when building your final releases.
+#if OPENGL_DEBUG
 
 #include <windows.h>
 #include <GL/gl.h>
@@ -46,3 +47,9 @@ static void assertGlError(const char* error_message)
 	MessageBox(NULL, error_message, getErrorString(ErrorValue), 0x00000000L);
 	ExitProcess(0);
 }
+
+#else
+
+#define CHECK_ERRORS()
+
+#endif

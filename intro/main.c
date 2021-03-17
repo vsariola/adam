@@ -2,7 +2,7 @@
 #define USE_MIPMAPS  1
 #define FAIL_KILL true
 #define PID_QUALIFIER const
-#define OPENGL_DEBUG 1
+#define OPENGL_DEBUG 0
 
 // minify windows.h
 #define WIN32_LEAN_AND_MEAN
@@ -14,9 +14,7 @@
 #include <mmreg.h>
 #include <GL/gl.h>
 
-#if OPENGL_DEBUG
 #include "debug.h"
-#endif
 
 #include "glext.h"
 #include <song.h>
@@ -150,7 +148,7 @@ void entrypoint(void)
 		//f[0] = (float)MMTime.u.sample / 44100.0f / 60.0f * 144.0f;		
 		//f[1] = fmod(f[0], 1.0f);
 		// add some offset to time to account for the lag in wave out
-		((PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv"))(0, 5, &syncBuf[((MMTime.u.sample+16384) >> 8) * SU_NUMSYNCS]);
+		((PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv"))(0, 16, &syncBuf[((MMTime.u.sample+16384) >> 8) * SU_NUMSYNCS]);
 		CHECK_ERRORS();
 
 		glRects(-1, -1, 1, 1);
