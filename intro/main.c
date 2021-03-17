@@ -149,7 +149,8 @@ void entrypoint(void)
 		//GLfloat f[5];
 		//f[0] = (float)MMTime.u.sample / 44100.0f / 60.0f * 144.0f;		
 		//f[1] = fmod(f[0], 1.0f);
-		((PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv"))(0, 5, &syncBuf[MMTime.u.sample >> 8]);
+		// add some offset to time to account for the lag in wave out
+		((PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv"))(0, 5, &syncBuf[((MMTime.u.sample+16384) >> 8) * SU_NUMSYNCS]);
 		CHECK_ERRORS();
 
 		glRects(-1, -1, 1, 1);

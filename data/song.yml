@@ -42,9 +42,6 @@ score:
           order: [0, -1, 0, 1, 0, -1, 0, 1, 0, -1, 0, 1, 0, -1, 0, 1, 0, -1, 0, 1, 0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 2, -1, -1, 1, 2, -1, -1, 1, 2]
           patterns: [[90, 0, 1, 1, 1, 1, 95, 0, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 88, 0, 1, 1, 1, 1], [90, 0]]
         - numvoices: 1
-          order: [0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0]
-          patterns: [[92]]
-        - numvoices: 1
           order: [-1, -1, -1, -1, -1, -1, -1, -1, 0, -1, 0, 1, 0, -1, 0, 2, 0, -1, 0, 1, 0, -1, 3, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, 0, -1, 0, -1, 0]
           patterns: [[90, 1, 93, 1, 95, 1, 1, 1, 1, 1, 1, 1, 1], [95, 1, 1, 1, 95, 1, 95, 1, 1, 1, 97, 1, 93, 1, 1], [95, 1, 1, 1, 95, 1, 95, 1, 1, 1, 95, 1, 102, 1, 1], [95, 0, 1, 93, 0, 1, 90, 0, 93, 0, 1, 90, 0, 1, 88, 0], [107], [90], [90, 0], [90]]
     rowsperpattern: 16
@@ -56,6 +53,7 @@ patch:
         - type: envelope
           id: 5
           parameters: {attack: 48, decay: 64, gain: 128, release: 64, stereo: 1, sustain: 64}
+        - type: sync
         - type: oscillator
           id: 6
           parameters: {color: 3, detune: 76, gain: 12, phase: 0, shape: 64, stereo: 1, transpose: 64, type: 1, unison: 3}
@@ -67,7 +65,7 @@ patch:
           parameters: {bandpass: 0, frequency: 24, highpass: 1, lowpass: 0, negbandpass: 0, neghighpass: 0, resonance: 128, stereo: 1}
         - type: delay
           id: 9
-          parameters: {count: 0, damp: 0, delay: 0, dry: 128, feedback: 107, notetracking: 0, pregain: 40, stereo: 1}
+          parameters: {count: 0, damp: 0, delay: 0, dry: 64, feedback: 107, notetracking: 0, pregain: 40, stereo: 1}
           varargs: [9187, 13778]
         - type: outaux
           id: 10
@@ -150,6 +148,9 @@ patch:
         - type: envelope
           id: 27
           parameters: {attack: 48, decay: 71, gain: 128, release: 0, stereo: 0, sustain: 0}
+        - type: sync
+          id: 197
+          parameters: {}
         - type: send
           id: 174
           parameters: {amount: 32, port: 4, sendpop: 0, stereo: 0, target: 18, unit: 0, voice: 0}
@@ -389,7 +390,8 @@ patch:
           parameters: {auxgain: 32, outgain: 0, stereo: 1}
         - type: envelope
           id: 130
-          parameters: {attack: 84, decay: 0, gain: 64, release: 81, stereo: 0, sustain: 128}
+          parameters: {attack: 84, decay: 0, gain: 64, release: 64, stereo: 0, sustain: 128}
+        - type: sync
         - type: send
           id: 131
           parameters: {amount: 128, port: 0, sendpop: 1, stereo: 0, target: 132, unit: 0, voice: 0}
@@ -399,6 +401,7 @@ patch:
         - type: envelope
           id: 133
           parameters: {attack: 0, decay: 0, gain: 24, release: 0, stereo: 1, sustain: 64}
+        - type: sync
         - type: oscillator
           id: 134
           parameters: {color: 1, detune: 0, gain: 8, phase: 0, shape: 64, stereo: 1, transpose: 112, type: 1, unison: 3}
@@ -473,18 +476,6 @@ patch:
         - type: outaux
           id: 188
           parameters: {auxgain: 16, outgain: 16, stereo: 1}
-    - name: FadeIn
-      numvoices: 1
-      units:
-        - type: envelope
-          id: 191
-          parameters: {attack: 0, decay: 112, gain: 128, release: 0, stereo: 0, sustain: 0}
-        - type: send
-          id: 192
-          parameters: {amount: 32, port: 4, sendpop: 0, stereo: 0, target: 177, unit: 0, voice: 0}
-        - type: send
-          id: 193
-          parameters: {amount: 32, port: 4, sendpop: 1, stereo: 0, target: 183, unit: 0, voice: 0}
     - name: Dip
       numvoices: 1
       units:
@@ -516,6 +507,9 @@ patch:
         - type: in
           id: 79
           parameters: {channel: 2, stereo: 1}
+        - type: filter
+          id: 200
+          parameters: {bandpass: 0, frequency: 128, highpass: 0, lowpass: 1, negbandpass: 0, neghighpass: 0, resonance: 128, stereo: 1}
         - type: delay
           id: 80
           parameters: {count: 8, damp: 0, delay: 1, dry: 128, feedback: 96, notetracking: 0, pregain: 40, stereo: 1}
@@ -541,3 +535,12 @@ patch:
         - type: out
           id: 99
           parameters: {gain: 128, stereo: 1}
+        - type: envelope
+          id: 202
+          parameters: {attack: 0, decay: 112, gain: 128, release: 0, stereo: 0, sustain: 0}
+        - type: send
+          id: 203
+          parameters: {amount: 32, port: 4, sendpop: 0, stereo: 0, target: 115, unit: 0, voice: 0}
+        - type: send
+          id: 204
+          parameters: {amount: 32, port: 4, sendpop: 1, stereo: 0, target: 177, unit: 0, voice: 0}
