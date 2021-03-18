@@ -37,6 +37,13 @@ float sdBox( vec3 p, vec3 b ) {
   return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
+float sdBoxInvertXY( vec3 p, vec3 b ) {
+    float d = -sdBox(vec3(p.xy,0.),b);
+    vec2 w = vec2( d, abs(p.z) - b.z );
+    return min(max(w.x,w.y),0.0) + length(max(w,0.0));
+}
+
+
 float sdSphere( vec3 p, float s ) {
   return length(p)-s;
 }
@@ -95,8 +102,7 @@ vec3 screen(vec2 p) {
 }
 
 vec4 hall(vec3 p) {      
-
-    return vec4(0.,0.,0.,-min(sdCappedCylinder(p+vec3(0.,10.,0.),40.,25.),sdBox(p-vec3(0.,11.,-40.),vec3(2.,3.,20.))));
+    return vec4(0.,0.,0.,min(-sdCappedCylinder(p+vec3(0.,10.,15.),40.,40.),sdBoxInvertXY(p-vec3(0.,9.5,-40.),vec3(2.,3.,15.))));
 }
 
 vec4 lightRigs(vec3 p) {
@@ -148,10 +154,10 @@ void main()
     
     // PASTE FROM HERE
     // ---------------
-    beat = syncs[0]/4.0;
+     beat = syncs[0]/4.0;
     pattern = beat/4.0;
-    part = pattern/8.0;
-    partBeat = mod(beat,32.);
+    part = pattern/2.0;
+    partBeat = mod(beat,8.);
 
     vec3 projector = vec3(-5.,15.,5.);
 
@@ -160,28 +166,68 @@ void main()
     vec3 o = vec3(sin(beat*0.2)-15.0,cos(beat*0.2)*5.+10.,cos(beat*0.2)*10.-10.);
     float yaw = 0.;
     float pitch = 0.;
+    float roll = 0.;
     
-    if (part < 2.) {
+    if (part > 43. && part < 43.5) {
+        part = (part-43.)*16.+8.;
+    }
+
+    if (part > 43.5 && part < 44.) {
+        part = (part-43.5)*32.+8.;
+    }
+
+   if (part < 8.) {
         o = vec3(0.,10.,beat-55.);
-    } else if (part < 3.) {
-        o = vec3(-25,15.,partBeat-21.);  
-        yaw = -1.0;
+    } else if (part < 28. || (part > 34. && part < 40.)) {        
+        part = mod(part,8.);
+        if (part < 1.) {
+            o = vec3(-25,15.,partBeat*4.-21.);  
+            yaw = -1.2;
+            pitch = .4;
+        } else if (part < 2.) {
+            o = vec3(15.,10.,partBeat*4.-24.);          
+        } else if (part < 3.) {
+            o = vec3(0.,1.,partBeat*4.-24.);
+            pitch = -1.2;        
+        } else if (part < 3.5 || (part > 7. && part < 7.5)) {
+            o = vec3(-25.,5.,-24.);
+            pitch = -0.5;                
+            yaw = -0.6;
+        } else if (part < 4. || part > 7.) {
+            o = vec3(0.,10.,15.-partBeat);
+        } else if (part < 5.) {            
+            o = vec3(0.,24.,partBeat*4.-24.);            
+            pitch = 0.7;            
+        } else if (part < 6.) {
+            o = vec3(-18.+partBeat*4.,11.,-22.);     
+        } else {
+            o = vec3(10.,16.,partBeat*4.-20.);
+            yaw = 1.4;
+            pitch = 0.5-partBeat/32.;
+        }
+        if (pattern>32.) {
+            o.x = -o.x;
+            yaw = pattern>32.?-yaw:yaw;
+        }
+    } else if (part < 30.) {
+        o = vec3(0.,11.,-24.);                
+    } else if (part < 34.) {
+        o = vec3(0.,10.,pattern-80.);
+        pitch = -1.4;
+    } else if (part < 44.) {
+        o = vec3(0.,10.,pattern-75.);
+    } else {
+        o = vec3(-25,15.,pattern-97.);  
+        yaw = -1.2;
         pitch = .4;
-    } else if (part < 4.) {
-        o = vec3(15.,10.,partBeat-24.);          
-    } else if (part < 5.) {
-        o = vec3(0.,15.,partBeat-24.);
-        yaw = 0.;
-        pitch = 1.4-partBeat/32.;
     }
     
     vec3 r = normalize(vec3(uv,1.));
     
+    r.xy = mat2(cos(roll),sin(roll),-sin(roll),cos(roll)) * r.xy;   
     r.yz = mat2(cos(pitch),sin(pitch),-sin(pitch),cos(pitch)) * r.yz;    
-    r.xz = mat2(cos(yaw),sin(yaw),-sin(yaw),cos(yaw)) * r.xz;
-    //angle = (cos(beat*0.6125) * 0.2-0.5)*syncs[1];
-    //rot = mat2(cos(angle),sin(angle),-sin(angle),cos(angle));    
-    //r.xz = rot * r.xz;    
+    r.xz = mat2(cos(yaw),sin(yaw),-sin(yaw),cos(yaw)) * r.xz;       
+
     
     
     float d = 0.;
@@ -193,7 +239,7 @@ void main()
         }
         p = o + r * d;
         vec4 b = map(p); 
-        if (b.w < 0.1) {
+        if (b.w < 0.01) {
             col = b.xyz * .5 / d;
             break;
         }                      
@@ -202,7 +248,7 @@ void main()
                 
     for (float d2=d;d2>0.;d2-=0.5) {              
         p -= 0.5*r;        
-        col += (vec3(0.015)+(abs(p.x-p.y+20.)<40.*clamp((pattern-64.)/16.0,0.,1.)?pow(p.y/15.,4.):0.)*vec3(0.4,0.36,0.3) + 2.*screen(p.xy)*exp(p.z-25.) - col) * fogMap(p) * 0.03 * min(d2,0.5);        
+        col += ((vec3(0.015)+(abs(p.x-p.y+29.)<40.*clamp((pattern-64.)/16.0,0.,1.)?pow(p.y/15.,4.):0.)*vec3(0.4,0.36,0.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25.)) * 0.03 * min(d2,0.5);        
     }
         
     if (syncs[4] > 0.0) {
@@ -261,5 +307,5 @@ void main()
     // ----------------
     // PASTE UNTIL HERE
     // Output to screen     
-    output = vec4(pow(col * 5.,vec3(0.5)),1.0) * smoothstep(0.,1.0,min(pattern,(94.-pattern))/8.);
+    output = vec4(sqrt(col * 5.),1.0) * smoothstep(0.,1.0,min(pattern,(94.-pattern))/8.);
 }

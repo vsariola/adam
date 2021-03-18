@@ -555,7 +555,7 @@ patch:
           parameters: {attack: 0, decay: 112, gain: 128, release: 0, stereo: 0, sustain: 0}
         - type: send
           id: 203
-          parameters: {amount: 32, port: 4, sendpop: 0, stereo: 0, target: 115, unit: 0, voice: 0}
+          parameters: {amount: 32, port: 4, sendpop: 0, stereo: 0, target: 183, unit: 0, voice: 0}
         - type: send
           id: 204
           parameters: {amount: 32, port: 4, sendpop: 1, stereo: 0, target: 177, unit: 0, voice: 0}
@@ -564,7 +564,7 @@ patch:
           parameters: {}
         - type: filter
           id: 1107
-          parameters: {bandpass: 0, frequency: 1, highpass: 0, lowpass: 1, negbandpass: 0, neghighpass: 0, resonance: 128, stereo: 0}
+          parameters: {bandpass: 0, frequency: 2, highpass: 0, lowpass: 1, negbandpass: 0, neghighpass: 0, resonance: 128, stereo: 0}
         - type: sync
           id: 1108
           parameters: {}
