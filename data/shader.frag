@@ -6,8 +6,8 @@ vec2 iResolution = vec2(1280.0,720.0);
 
 // PASTE FROM HERE
 // ---------------
-float beat,pattern,part,partBeat,yaw,pitch;
-vec3 col;
+float beat,pattern,part,partBeat,yaw,pitch,d;
+vec3 col,o,r;
 
 float noise3d(vec3 p)
 {
@@ -92,21 +92,20 @@ float stage(vec3 p) {
     return min(min(dist,sdBox(p-vec3(0,0,20.),vec3(2.,15.,1.))),p.y<1.0?voronoiPeople(p):p.y-0.7);
 }
 
-
-float map(vec3 p) {    
-    float f = p.y;    
-    
-    return min(min(min(hall(p),f),lightRigs(p)),stage(p));
+float map(vec3 p) {     
+    return min(min(min(hall(p),p.y),lightRigs(p)),stage(p));
 }
 
 // Calculates the distance from a ray (o + r*d) to a line segment between points a & b
 // also returns the solution, in case
 
-vec4 distRayToSegment(vec3 a,vec3 ba,vec3 o,vec3 r) {
-    vec3 uvw = inverse(mat3(ba,-r,cross(ba,r)))*(o-a);
+void light(vec3 pos,vec3 dir,vec3 color, float a,float b, float c,float x) {
+    vec3 ba = r*d;
+    vec3 uvw = inverse(mat3(ba,-dir,cross(ba,dir)))*(pos-o);
     uvw.x = uvw.x<0. ? 0. : uvw.x>1.0?1.0:uvw.x;    
     uvw.y = uvw.y<0. ? 0. : uvw.y;
-    return vec4(uvw,length(a+uvw.x*ba-o-uvw.y*r)); // returns also the solution
+    float beamwidth = 1.+uvw.y*x;                
+    col += color*a*exp(-b*length(o+uvw.x*ba-pos-uvw.y*dir)/beamwidth)/beamwidth/beamwidth*fogMap((o+uvw.y*r)*c)/sqrt(1.-pow(dot(r,dir)/length(dir),2.));
 }
 // ----------------
 // PASTE UNTIL HERE
@@ -125,8 +124,6 @@ void main()
 
     // Normalized pixel coordinates (from 0 to 1)
     
-    vec3 o = vec3(sin(beat*0.2)-15.0,cos(beat*0.2)*5.+10.,cos(beat*0.2)*10.-10.);
-
     if (part > 43. && part < 43.5) {
         part = (part-43.)*16.+8.;
     }
@@ -134,7 +131,7 @@ void main()
     if (part > 43.5 && part < 44.) {
         part = (part-43.5)*32.+8.;
     }
-
+    
     if (part < 8.) {
         o = vec3(0.,10.,beat-55.);
     } else if (part < 28. || (part > 34. && part < 40.)) {        
@@ -184,21 +181,17 @@ void main()
     
     yaw += fogMap(o/2.)*0.02-0.01;
     
-    vec3 r = normalize(vec3(uv,1.));
+    r = normalize(vec3(uv,1.));
     
     r.yz = mat2(cos(pitch),sin(pitch),-sin(pitch),cos(pitch)) * r.yz;    
     r.xz = mat2(cos(yaw),sin(yaw),-sin(yaw),cos(yaw)) * r.xz;           
     
-    float d = 0.;
     vec3 p;    
     
-    for (int i = 0;i < 190;i++) {    
-        if (d > 70.0) {
-            break;
-        }
+    for (int i = 0;i < 199;i++) {        
         p = o + r * d;
         float b = map(p); 
-        if (b < 0.01) {                
+        if (b < 0.01 || d > 70.0) {                
             break;
         }                      
         d += b * (p.y < 2.?0.1:1.);                
@@ -210,31 +203,27 @@ void main()
     }
         
     if (syncs[4] > 0.0) {
+        // lasers
         for (int j =-2;j < 3;j++) {   
             float angle = float(j)/1.9;  
-            for (int i = 0;i < 30;i++) {          
-                vec3 dir = vec3(sin(float(i-15)+beat*1000.),0.1,-2.);
-                vec3 pos = vec3(sin(angle),cos(angle),0);  
-                vec4 ld = distRayToSegment(o,r*d,pos*15.+vec3(0,0,19.0),dir);
-                float b = .5*exp(-50.*ld.w)*fogMap((o+ld.y*r)*3.)/sqrt(1.-pow(dot(r,dir)/length(dir),2.));
-                col += vec3(0.2,1.,0.1)*b;
+            for (int i = 0;i < 30;i++) {             
+                light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),vec3(sin(float(i-15)+beat*1000.),0.1,-2.),vec3(0.2,1.,0.1),.5,50.,3.,0.);
             }
         }
     }
             
-            
-    for (int k = 0;k < 2;k++) {
-        for (int i = 0;i < 20;i++) {             
-            float rig = float((int((pattern>16.?beat:3.)))%4-2);
-            vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
-            vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
-            dir.z = 2.-4.*mod(rig,2.);
-            dir.xy += dir.yx * vec2(-1.,1.) * (syncs[6]-0.5)*10.;
-            pos.x += 15.-float(k)*30.;                        
-            vec4 ld = distRayToSegment(o,r*d,pos,dir);        
-            float beamwidth = 1.+ld.y*3.;
-            float b = 60.*exp(-80./beamwidth*ld.w)/beamwidth/beamwidth/sqrt(1.-pow(dot(r,dir)/length(dir),2.))*fogMap(o+ld.y*r);
-            col += vec3(1.,1.,0.6)*b*(pattern<8.||pattern>88.?0.:pattern<16.?1.:syncs[2]);
+    if (pattern>8.&&pattern<88.) {
+        for (int k = 0;k < 2;k++) {
+            // round lightrigs hanging from the ceiling
+            for (int i = 0;i < 20;i++) {             
+                float rig = float((int((pattern>16.?beat:3.)))%4-2);
+                vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
+                vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
+                dir.z = 2.-4.*mod(rig,2.);
+                dir.xy += dir.yx * vec2(-1.,1.) * (syncs[6]-0.5)*10.;
+                pos.x += 15.-float(k)*30.;                                    
+                light(pos,dir,vec3(1.,1.,0.6)*(pattern<16.?1.:syncs[2]),60.,80.,1.,3.);
+            }
         }
     }
     
@@ -243,10 +232,7 @@ void main()
             vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),cos((float(i)+0.5)*6.28/20.)/2.+1.,-1.);
             vec3 pos = vec3(float(i),2.5,19.);            
             dir.z += sin(beat)*1.0;                    
-            vec4 ld = distRayToSegment(o,r*d,pos,dir);        
-            float beamwidth = 1.0+ld.y*5.;
-            float b = 60.*exp(-80./beamwidth*ld.w)/beamwidth/beamwidth/sqrt(1.-pow(dot(r,dir)/length(dir),2.))*fogMap(o+ld.y*r);
-            col += vec3(1.,0.4,0.6)*b*pow(cos(float(i)/10.+beat),2.);
+            light(pos,dir,vec3(1.,0.4,0.6),60.,80.,1.,5.);           
         }
     }
    
@@ -254,11 +240,8 @@ void main()
         for (int i = -20;i < 20;i++) {
             vec3 dir = vec3(0.,-1.0,.0);
             vec3 pos = vec3(float(i),20.,15.);            
-            dir.xy += sin(beat)*1.0;                    
-            vec4 ld = distRayToSegment(o,r*d,pos,dir);        
-            float beamwidth = 1.0+ld.y*5.;
-            float b = 60.*exp(-80./beamwidth*ld.w)/beamwidth/beamwidth/sqrt(1.-pow(dot(r,dir)/length(dir),2.))*fogMap(o+ld.y*r);
-            col += vec3(1.,0.4,0.6)*b*pow(cos(float(i)/10.+beat),2.);
+            dir.xy += sin(beat)*1.0;      
+            light(pos,dir,vec3(1.,0.4,0.6)*pow(cos(float(i)/10.+beat),2.),60.,80.,1.,5.);
         }
     }
 
