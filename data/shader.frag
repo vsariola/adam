@@ -183,9 +183,9 @@ void main()
         o = vec3(0.,10.,pattern-80.);
         pitch = -1.4;
         secondaryColor = tertiaryColor;
-    } else if (part < 44.) {
-        o = vec3(0.,10.,part-35.);
-        secondaryColor = tertiaryColor;        
+    } else if (part < 44.) {        
+        o = vec3(0.,10.,327.-beat);
+        secondaryColor = vec3(1.0,0.,0.);        
     } else {
         o = vec3(-25,15.,pattern-97.);  
         yaw = -1.2;
@@ -225,7 +225,7 @@ void main()
                 
     // round lightrigs hanging from the ceiling
     for (int i = 0;i < 40;i++) {             
-        float rig = float((int((pattern>16.?beat:3.)))%4-2);
+        float rig = float((int((pattern>16.&&pattern<40.?beat:3.)))%4-2);
         vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
         vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
         dir.z = 2.-4.*mod(rig,2.);
@@ -250,7 +250,7 @@ void main()
             sin(beat+float(i)*.2)*1.0),
             tertiaryColor,
             150.,80.,1.,10.);
-    }
+    }   
        
 
     // ----------------
