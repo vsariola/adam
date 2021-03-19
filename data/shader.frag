@@ -67,10 +67,8 @@ float voronoiPeople( vec3 point )
 
 vec3 screen(vec2 p) {  
     p.y -= 10.;
-    if (abs(p.x)>25. || abs(p.y)>11.) {
-        return vec3(0.,0.,0.0);
-    }            
-    return float(int(p.x)&int(beat+0.5)%5+int(p.y)&(int(beat))%7)*secondaryColor*syncs[2]+syncs[3]*10.;
+    return smoothstep(0.,1.,min(25.-abs(p.x),11.-abs(p.y)))
+      * (float(int(p.x)&int(beat+0.5)%5+int(p.y)&(int(beat))%7)*secondaryColor*syncs[2]+syncs[3]*10.);
 }
 
 float hall(vec3 p) {    
