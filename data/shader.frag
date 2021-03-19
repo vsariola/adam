@@ -7,7 +7,9 @@ vec2 iResolution = vec2(1280.0,720.0);
 // PASTE FROM HERE
 // ---------------
 float beat,pattern,part,partBeat,yaw,pitch,d;
-vec3 col,o,r;
+vec3 col,o,r,primaryColor,secondaryColor,tertiaryColor;
+int partIndex;
+
 
 float noise3d(vec3 p)
 {
@@ -67,8 +69,8 @@ vec3 screen(vec2 p) {
     p.y -= 10.;
     if (abs(p.x)>25. || abs(p.y)>11.) {
         return vec3(0.,0.,0.0);
-    }        
-    return vec3(float(int(p.x)&int(beat+0.5)%5)+float(int(p.y)&(int(beat))%7),0,0)*syncs[2]+syncs[3]*10.;
+    }            
+    return float(int(p.x)&int(beat+0.5)%5+int(p.y)&(int(beat))%7)*secondaryColor*syncs[2]+syncs[3]*10.;
 }
 
 float hall(vec3 p) {    
@@ -121,6 +123,12 @@ void main()
     pattern = beat/4.0;
     part = pattern/2.0;
     partBeat = mod(beat,8.);
+    partIndex = int(part);
+    
+    primaryColor = vec3(1.);
+    if (part > 4. && part < 44.) {
+        secondaryColor = vec3(3.,1.,0.);    
+    }    
 
     // Normalized pixel coordinates (from 0 to 1)
     
@@ -166,13 +174,20 @@ void main()
             o.x = -o.x;
             yaw = pattern>32.?-yaw:yaw;
         }
+        float primaryHue = float(part/4.0);
+        primaryColor = (vec3(cos(primaryHue),cos(primaryHue+2.0),cos(primaryHue+4.0))*.5+.5)*syncs[2];
+        secondaryColor = primaryColor;
+        tertiaryColor = primaryColor;
     } else if (part < 32.) {
-        o = vec3(0.,11.,-24.);                
+        o = vec3(0.,11.,pattern-80.);                
+        secondaryColor = tertiaryColor;
     } else if (part < 34.) {
         o = vec3(0.,10.,pattern-80.);
         pitch = -1.4;
+        secondaryColor = tertiaryColor;
     } else if (part < 44.) {
-        o = vec3(0.,10.,pattern-75.);
+        o = vec3(0.,10.,part-35.);
+        secondaryColor = tertiaryColor;        
     } else {
         o = vec3(-25,15.,pattern-97.);  
         yaw = -1.2;
@@ -199,7 +214,7 @@ void main()
                 
     for (float d2=d;d2>0.;d2-=0.5) {              
         p -= 0.5*r;               
-        col += ((vec3(0.01)+(abs(p.x-p.y+29.)<40.*clamp((pattern-64.)/16.0,0.,1.)?pow(p.y/15.,4.):0.)*vec3(0.4,0.36,0.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25.)) * 0.03 * min(d2,0.5);        
+        col += ((vec3(0.007)+(abs(p.x-p.y+29.)<40.*clamp((pattern-64.)/16.0,0.,1.)?pow(p.y/15.,4.):0.)*vec3(0.4,0.36,0.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25.)) * 0.03 * min(d2,0.5);        
     }
         
     if (syncs[4] > 0.0) {
@@ -210,39 +225,40 @@ void main()
                 light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),vec3(sin(float(i-15)+beat*1000.),0.1,-2.),vec3(0.2,1.,0.1),.5,50.,3.,0.);
             }
         }
-    }
+    }       
             
-    if (pattern>8.&&pattern<88.) {
-        for (int k = 0;k < 2;k++) {
-            // round lightrigs hanging from the ceiling
-            for (int i = 0;i < 20;i++) {             
-                float rig = float((int((pattern>16.?beat:3.)))%4-2);
-                vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
-                vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
-                dir.z = 2.-4.*mod(rig,2.);
-                dir.xy += dir.yx * vec2(-1.,1.) * (syncs[6]-0.5)*10.;
-                pos.x += 15.-float(k)*30.;                                    
-                light(pos,dir,vec3(1.,1.,0.6)*(pattern<16.?1.:syncs[2]),60.,80.,1.,3.);
-            }
+    for (int k = 0;k < 2;k++) {
+        // round lightrigs hanging from the ceiling
+        for (int i = 0;i < 20;i++) {             
+            float rig = float((int((pattern>16.?beat:3.)))%4-2);
+            vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
+            vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
+            dir.z = 2.-4.*mod(rig,2.);
+            dir.xy += dir.yx * vec2(-1.,1.) * (syncs[7]-0.5)*10.;
+            pos.x += 15.-float(k)*30.;                                    
+            light(pos,dir,secondaryColor,60.,80.,1.,3.);
         }
     }
     
-    if (pattern >24.&&pattern<88.) {
+    /*if (pattern >24.&&pattern<88.) {
         for (int i = -20;i < 20;i++) {
             vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),cos((float(i)+0.5)*6.28/20.)/2.+1.,-1.);
             vec3 pos = vec3(float(i),2.5,19.);            
             dir.z += sin(beat)*1.0;                    
-            light(pos,dir,vec3(1.,0.4,0.6),60.,80.,1.,5.);           
+            light(pos,dir,primaryColor,60.,80.,1.,5.);           
         }
+    }*/
+        
+    for (int i =-20;i < 21;i++) {   
+        float angle = float(i)*.07;  
+        light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),vec3(sin(angle),cos(angle),0)+vec3(0.,0.5,-2.),primaryColor * (syncs[5]+(part > 28. && part < 32.?1.+sin(part-angle):0.)),60.,80.,1.,20.);
     }
    
-    if (pattern > 32.&&pattern<88.) {
-        for (int i = -20;i < 20;i++) {
-            vec3 dir = vec3(0.,-1.0,.0);
-            vec3 pos = vec3(float(i),20.,15.);            
-            dir.xy += sin(beat)*1.0;      
-            light(pos,dir,vec3(1.,0.4,0.6)*pow(cos(float(i)/10.+beat),2.),60.,80.,1.,5.);
-        }
+    for (int i = -20;i < 21;i++) {
+        vec3 dir = vec3(float(i)*.1,-3.0,1.0);
+        vec3 pos = vec3(float(i),20.,-15. + float(int(pattern)%3)*10.);            
+        dir.z += sin(beat+float(i)*.2)*1.0;      
+        light(pos,dir,tertiaryColor,60.,80.,1.,5.);
     }
 
     // ----------------
