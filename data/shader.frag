@@ -151,8 +151,8 @@ void main()
         } else if (part < 2.) {
             o = vec3(15.,10.,partBeat*4.-24.);          
         } else if (part < 3.) {
-            o = vec3(0.,1.,partBeat*4.-24.);
-            pitch = -1.+partBeat*.05;        
+            o = vec3(0.,4.,partBeat*4.-24.);
+            pitch = -.7+partBeat*.05;        
         } else if (part < 3.5 || (part > 7. && part < 7.5)) {
             o = vec3(-25.,5.,-24.);
             pitch = -0.5;                
@@ -219,37 +219,39 @@ void main()
         
     if (syncs[4] > 0.0) {
         // lasers
-        for (int j =-2;j < 3;j++) {   
-            float angle = float(j)/1.9;  
-            for (int i = 0;i < 30;i++) {             
-                light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),vec3(sin(float(i-15)+beat*1000.),0.1,-2.),vec3(0.2,1.,0.1),.5,50.,3.,0.);
-            }
-        }
+        for (int i = 0;i < 150;i++) {    
+            float angle = float(i/30-2)/1.9;              
+            light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),vec3(sin(float(i)+beat*1000.),0.1,-2.),vec3(0.2,1.,0.1),.5,50.,3.,0.);
+        }        
     }       
-            
-    for (int k = 0;k < 2;k++) {
-        // round lightrigs hanging from the ceiling
-        for (int i = 0;i < 20;i++) {             
-            float rig = float((int((pattern>16.?beat:3.)))%4-2);
-            vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
-            vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
-            dir.z = 2.-4.*mod(rig,2.);
-            dir.xy += dir.yx * vec2(-1.,1.) * (syncs[7]-0.5)*10.;
-            pos.x += 15.-float(k)*30.;                                    
-            light(pos,dir,secondaryColor,60.,80.,1.,3.);
-        }
-    }
+                
+    // round lightrigs hanging from the ceiling
+    for (int i = 0;i < 40;i++) {             
+        float rig = float((int((pattern>16.?beat:3.)))%4-2);
+        vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
+        vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
+        dir.z = 2.-4.*mod(rig,2.);
+        dir.xy += dir.yx * vec2(-1.,1.) * syncs[7]*10.;
+        pos.x += 15.-float(i/20)*30.;                                    
+        light(pos,dir,secondaryColor,60.,80.,1.,3.);
+    }    
 
-    for (int i =-20;i < 21;i++) {   
+    for (int i =-20;i < 21;i++) { 
+        // front lights
         float angle = float(i)*.07;  
-        light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),vec3(sin(angle),cos(angle),0)+vec3(0.,0.5,-2.),primaryColor * (syncs[5]+(part > 28. && part < 32.?1.+sin(part-angle):0.)),60.,80.,1.,20.);
-    }
-   
-    for (int i = -20;i < 21;i++) {
-        vec3 dir = vec3(float(i)*.1,-3.0,0.0);
-        vec3 pos = vec3(float(i),20.,-15. + float((int(pattern)+i/4)%3)*10.);            
-        dir.z += sin(beat+float(i)*.2)*1.0;      
-        light(pos,dir,tertiaryColor,150.,80.,1.,10.);
+        light(
+            vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),
+            vec3(sin(angle),cos(angle),0)+vec3(0.,0.5,-2.),
+            primaryColor * (syncs[5]+(part > 28. && part < 32.?1.+sin(part-angle):0.)),
+            60.,80.,1.,20.);
+        
+        // ceiling lights         
+        light(
+            vec3(float(i),20.,-15. + float((int(pattern)+i/4)%3)*10.),
+            vec3(float(i)*.1,-3.0,
+            sin(beat+float(i)*.2)*1.0),
+            tertiaryColor,
+            150.,80.,1.,10.);
     }
        
 
