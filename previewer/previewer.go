@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"path"
+	"path/filepath"
 	"runtime"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
@@ -49,54 +48,80 @@ func main() {
 	fmt.Println("OpenGL version", version)
 	checkGLError()
 
-	testProgram, err := loadShaders(testFragmentShader, singleQuadVertexShader)
+	defaultProgram, err := loadShaders(testFragmentShader, singleQuadVertexShader)
 	if err != nil {
 		panic(err)
 	}
-	program := testProgram
+	program := defaultProgram
 
 	_, myname, _, _ := runtime.Caller(0)
-	filename := path.Join(path.Dir(myname), "..", "data", "shader.frag")
+	filename := filepath.Join(filepath.Dir(myname), "..", "data", "shader.frag")
 
-	shaderSourceBytes, err := ioutil.ReadFile(filename)
+	closeWatcher, newShader, err := loadAndWatchShader(filename)
 	if err != nil {
 		panic(err)
 	}
-
-	program, err = loadShaders(string(shaderSourceBytes), singleQuadVertexShader)
-	if err != nil {
-		fmt.Printf("error loading %v: %v\n%v\n", filename, err, getGLProgramInfoLog(program))
-		program = testProgram
-	}
-	gl.UseProgram(program)
-	if err := getGLError(); err != nil {
-		fmt.Println("CANNOT USE", err, "\n", getGLProgramInfoLog(program))
-	}
+	defer closeWatcher()
 
 	window.SetFramebufferSizeCallback(func(w *glfw.Window, width, height int) {
 		gl.Viewport(0, 0, int32(width), int32(height))
 	})
 
-	uname, usize, uxtype := getGLUniformInformation(program, 0)
-	fmt.Println("uniform#0", uname, usize, uxtype)
-	if usize == 0 {
-		fmt.Println("UNIFORM 0 NOT FOUND!!")
-	} else {
-		arr := make([]float32, usize)
-		gl.Uniform1fv(0, usize, &arr[0])
-		if err := getGLError(); err != nil {
-			fmt.Println("UNIFORM 0 ERROR", err)
-		}
-	}
+	var uname string
+	var uxtype uint32
+	var usize int32
 
 	for !window.ShouldClose() {
 		select {
 		case msg := <-receiver:
+			if usize <= 0 {
+				// NOP, no uniform?
+				return
+			}
 			l := int32(len(msg))
 			if l > usize {
 				l = usize
 			}
 			gl.Uniform1fv(0, l, &msg[0])
+		case src := <-newShader:
+			fmt.Println("RELOAD", filename, len(src), "b")
+			if program != defaultProgram {
+				gl.UseProgram(defaultProgram)
+				checkGLError()
+				gl.DeleteProgram(program)
+				checkGLError()
+			}
+			program, err = loadShaders(src, singleQuadVertexShader)
+			checkGLError()
+			if err != nil {
+				fmt.Printf("error loading %v: %v\n%v\n", filename, err, getGLProgramInfoLog(program))
+				// clear error if any
+				_ = getGLError()
+				program = defaultProgram
+				gl.UseProgram(program)
+				usize = 0
+				uname = ""
+				uxtype = 0
+				checkGLError()
+				break
+			}
+			gl.UseProgram(program)
+			if err := getGLError(); err != nil {
+				fmt.Println("CANNOT USE", err, "\n", getGLProgramInfoLog(program))
+			}
+			uname, usize, uxtype = getGLUniformInformation(program, 0)
+			fmt.Println("uniform#0", uname, usize, uxtype)
+			if usize == 0 {
+				fmt.Println("UNIFORM 0 NOT FOUND!!")
+			} else {
+				arr := make([]float32, usize)
+				gl.Uniform1fv(0, usize, &arr[0])
+				if err := getGLError(); err != nil {
+					fmt.Println("UNIFORM 0 ERROR", err)
+				}
+			}
+			checkGLError()
+
 		default:
 		}
 		gl.DrawArrays(gl.TRIANGLE_STRIP, 0, 4)

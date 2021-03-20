@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -50,6 +51,14 @@ func checkGLError() {
 	}
 }
 
+func checkGLErrorSkip(skip int) {
+	glErr := gl.GetError()
+	if glErr != gl.NO_ERROR {
+		_, file, line, _ := runtime.Caller(1 + skip)
+		fmt.Println("ERROR @", fmt.Sprintf("%v:%d", file, line), getGlErrorMessage(glErr))
+	}
+}
+
 func getGLError() error {
 	glErr := gl.GetError()
 	if glErr != gl.NO_ERROR {
@@ -63,7 +72,7 @@ func getGLUniformInformation(program, index uint32) (name string, size int32, xt
 	var length int32
 	nameb := make([]uint8, 64)
 	gl.GetActiveUniform(program, index, 64, &length, &size, &xtype, &nameb[0])
-	checkGLError()
+	checkGLErrorSkip(1)
 	return string(nameb[0:length]), size, xtype
 
 }
@@ -95,8 +104,65 @@ func compileShader(source string, shaderType uint32) (uint32, error) {
 
 		log := strings.Repeat("\x00", int(logLength+1))
 		gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(log))
-
-		return 0, fmt.Errorf("failed to compile %v: %v", source, log)
+		sourceLines := strings.Split(source, "\n")
+		type parsedError struct {
+			col     int64
+			row     int64
+			message string
+		}
+		errors := []parsedError{}
+		for _, logline := range strings.Split(log, "\n") {
+			if strings.HasPrefix(logline, "ERROR:") {
+				rawline := logline[7:]
+				fc := strings.Index(rawline, ":")
+				if fc == -1 {
+					continue
+				}
+				lc := strings.Index(rawline[fc+1:], ":") + fc + 1
+				if lc == fc {
+					continue
+				}
+				col, err := strconv.ParseInt(rawline[:fc], 10, 64)
+				if err != nil {
+					fmt.Println("CANNOT PARSE COL", err, rawline, fc, lc)
+					continue
+				}
+				row, err := strconv.ParseInt(rawline[fc+1:lc], 10, 64)
+				if err != nil {
+					fmt.Println("CANNOT PARSE ROW", err, rawline, fc, lc)
+					continue
+				}
+				errors = append(errors, parsedError{col, row, strings.TrimSpace(rawline[lc+2:])})
+			} else {
+				//fmt.Println("SKIP NON-ERROR", logline)
+			}
+		}
+		errmsg := "failed to compile:\n"
+		for _, err := range errors {
+			sr := int(err.row - 3)
+			if sr < 0 {
+				sr = 0
+			}
+			er := int(err.row + 2)
+			if er >= len(sourceLines) {
+				er = len(sourceLines) - 1
+			}
+			context := ""
+			for r := sr; r < er; r++ {
+				if r == int(err.row-1) {
+					context += fmt.Sprintf("%5d* ", r+1) + sourceLines[r] + "\n"
+					if err.col > 0 {
+						rowindicator := []byte(strings.Repeat(" ", int(err.col+1)))
+						rowindicator[len(rowindicator)-1] = '^'
+						context += "       " + string(rowindicator) + "\n"
+					}
+				} else {
+					context += fmt.Sprintf("%5d  ", r+1) + sourceLines[r] + "\n"
+				}
+			}
+			errmsg += fmt.Sprintf("%s (%d:%d)\n%s\n", err.message, err.row, err.col, context)
+		}
+		return 0, fmt.Errorf(errmsg)
 	}
 
 	return shader, nil
