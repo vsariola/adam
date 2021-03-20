@@ -1,7 +1,7 @@
 #version 400
 
 uniform float syncs[16];
-out vec4 output;
+out vec4 coutput;
 vec2 iResolution = vec2(1280.0,720.0);
 
 // PASTE FROM HERE
@@ -256,5 +256,5 @@ void main()
     // ----------------
     // PASTE UNTIL HERE
     // Output to screen     
-    output = vec4(sqrt(col * 5.),1.0) * smoothstep(0.,1.0,min(pattern,(94.-pattern))/8.);
+    coutput = vec4(sqrt(col * 5.),1.0) * smoothstep(0.,1.0,min(pattern,(94.-pattern))/8.);
 }
