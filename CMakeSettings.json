@@ -10,7 +10,13 @@
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
-      "variables": [],
+      "variables": [
+        {
+          "name": "OPENGL_DEBUG",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ],
       "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe"
     },
     {

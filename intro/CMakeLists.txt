@@ -1,5 +1,6 @@
 option(WINDOW "Define WINDOW macro, showing the intro in a small window instead of full screen" OFF)
 option(MINIFY_SHADERS "Use shader_minified minified shaders instead of hand-tuned ones" OFF)
+option(OPENGL_DEBUG "Show OpenGL errors in a message box" OFF)
 set(COMPRESS_LEVEL "medium" CACHE STRING "Crinkler compression level: off, light, medium, heavy")
 set_property(CACHE COMPRESS_LEVEL PROPERTY STRINGS OFF LIGHT MEDIUM HEAVY)
  
@@ -59,6 +60,10 @@ target_include_directories(intro PUBLIC ${CMAKE_CURRENT_BINARY_DIR}) # for the s
 if (WINDOW)
     message("Defining WINDOW macro")
     target_compile_definitions(intro PUBLIC WINDOW)
+endif()
+
+if (OPENGL_DEBUG)
+    target_compile_definitions(intro PUBLIC OPENGL_DEBUG)
 endif()
 
 if(NOT COMPRESS_LEVEL STREQUAL OFF)

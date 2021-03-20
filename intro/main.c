@@ -2,7 +2,6 @@
 #define USE_MIPMAPS  1
 #define FAIL_KILL true
 #define PID_QUALIFIER const
-#define OPENGL_DEBUG 0
 
 // minify windows.h
 #define WIN32_LEAN_AND_MEAN

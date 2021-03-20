@@ -1,6 +1,6 @@
 // This header contains some useful functions for debugging OpenGL.
 // Remember to disable them when building your final releases.
-#if OPENGL_DEBUG
+#ifdef OPENGL_DEBUG
 
 #include <windows.h>
 #include <GL/gl.h>
