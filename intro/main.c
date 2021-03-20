@@ -115,6 +115,11 @@ void entrypoint(void)
 #ifdef SU_LOAD_GMDLS
 	su_load_gmdls();
 #endif
+	// Use these lines to dump the data: #include <stdio.h>
+	// FILE* f;
+	// su_render_song(sointu_buffer);
+	// f = fopen("song.raw", "wb");
+	// fwrite((void*)sointu_buffer, sizeof(SUsample), SU_BUFFER_LENGTH, f);*/
 	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)su_render_song, sointu_buffer, 0, 0);	
 	waveOutOpen(&hWaveOut, WAVE_MAPPER, &WaveFMT, NULL, 0, CALLBACK_NULL);
 	waveOutPrepareHeader(hWaveOut, &WaveHDR, sizeof(WaveHDR));
