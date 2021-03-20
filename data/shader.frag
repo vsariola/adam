@@ -140,7 +140,9 @@ void main()
     
     if (part < 8.) {
         o = vec3(0.,10.,beat-55.);
-    } else if (part < 28. || (part > 34. && part < 40.)) {        
+    } else if (part < 28. || (part > 34. && part < 40.)) {    
+        float primaryHue = float(part/4.0);
+        primaryColor = (vec3(cos(primaryHue),cos(primaryHue+2.0),cos(primaryHue+4.0))*.5+.5)*(part > 20. && part < 28. ? pow(1.-mod(syncs[0]/2.,1.),2.) : syncs[2]);
         part = mod(part,8.);
         if (part < 1.) {
             o = vec3(-25,15.,partBeat*4.-21.);  
@@ -171,9 +173,7 @@ void main()
         if (pattern>32.) {
             o.x = -o.x;
             yaw = pattern>32.?-yaw:yaw;
-        }
-        float primaryHue = float(part/4.0);
-        primaryColor = (vec3(cos(primaryHue),cos(primaryHue+2.0),cos(primaryHue+4.0))*.5+.5)*syncs[2];
+        }        
         secondaryColor = primaryColor;
         tertiaryColor = primaryColor;
     } else if (part < 32.) {
@@ -229,7 +229,7 @@ void main()
         vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
         vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
         dir.z = 2.-4.*mod(rig,2.);
-        dir.xy += dir.yx * vec2(-1.,1.) * syncs[7]*10.;
+        dir.xy += dir.yx * vec2(-1.,1.) * syncs[7]*10. + (partIndex >= 20 && partIndex < 28 ? sin(vec2(float(i),float(i+9)) + beat) : vec2(0.));
         pos.x += 15.-float(i/20)*30.;                                    
         light(pos,dir,secondaryColor,60.,80.,1.,3.);
     }    
@@ -247,7 +247,7 @@ void main()
         light(
             vec3(float(i),20.,-15. + float((int(pattern)+i/4)%3)*10.),
             vec3(float(i)*.1,-3.0,
-            sin(beat+float(i)*.2)*1.0),
+            sin(beat+float(i*(partIndex >= 20 && partIndex < 28 ? 10 : 1))*.2)*1.0),
             tertiaryColor,
             150.,80.,1.,10.);
     }   
