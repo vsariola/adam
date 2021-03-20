@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"path"
 	"runtime"
-	"strings"
 
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -17,8 +16,6 @@ func init() {
 	// See documentation for functions that are only allowed to be called from the main thread.
 	runtime.LockOSThread()
 }
-
-const MAX_SYNCS = 5
 
 func main() {
 	receiver, err := rpc.Receiver()
@@ -50,109 +47,62 @@ func main() {
 
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
+	checkGLError()
+
+	testProgram, err := loadShaders(testFragmentShader, singleQuadVertexShader)
+	if err != nil {
+		panic(err)
+	}
+	program := testProgram
 
 	_, myname, _, _ := runtime.Caller(0)
-	shaderPath := path.Join(path.Dir(myname), "..", "data", "shader.frag")
-	shaderSourceBytes, err := ioutil.ReadFile(shaderPath)
-	if err != nil {
-		panic(err)
-	}
-	// that \x00 null termination is important, crashes otherwise
-	shaderSource := string(shaderSourceBytes) + "\x00"
-	//shaderSource := testFragmentShader
+	filename := path.Join(path.Dir(myname), "..", "data", "shader.frag")
 
-	program := gl.CreateProgram()
+	shaderSourceBytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
 
-	fragmentShader, err := compileShader(shaderSource, gl.FRAGMENT_SHADER)
+	program, err = loadShaders(string(shaderSourceBytes), singleQuadVertexShader)
 	if err != nil {
-		panic(err)
+		fmt.Printf("error loading %v: %v\n%v\n", filename, err, getGLProgramInfoLog(program))
+		program = testProgram
 	}
-	vertexShader, err := compileShader(string(singleQuadVertexShader), gl.VERTEX_SHADER)
-	if err != nil {
-		panic(err)
-	}
-	gl.AttachShader(program, fragmentShader)
-	gl.AttachShader(program, vertexShader)
-	gl.LinkProgram(program)
-	gl.DeleteShader(fragmentShader)
-	gl.DeleteShader(vertexShader)
 	gl.UseProgram(program)
+	if err := getGLError(); err != nil {
+		fmt.Println("CANNOT USE", err, "\n", getGLProgramInfoLog(program))
+	}
 
 	window.SetFramebufferSizeCallback(func(w *glfw.Window, width, height int) {
 		gl.Viewport(0, 0, int32(width), int32(height))
 	})
 
-	arr := make([]float32, MAX_SYNCS)
-	gl.Uniform1fv(0, MAX_SYNCS, &arr[0])
+	uname, usize, uxtype := getGLUniformInformation(program, 0)
+	fmt.Println("uniform#0", uname, usize, uxtype)
+	if usize == 0 {
+		fmt.Println("UNIFORM 0 NOT FOUND!!")
+	} else {
+		arr := make([]float32, usize)
+		gl.Uniform1fv(0, usize, &arr[0])
+		if err := getGLError(); err != nil {
+			fmt.Println("UNIFORM 0 ERROR", err)
+		}
+	}
+
 	for !window.ShouldClose() {
 		select {
 		case msg := <-receiver:
 			l := int32(len(msg))
-			if l > MAX_SYNCS {
-				l = MAX_SYNCS
+			if l > usize {
+				l = usize
 			}
 			gl.Uniform1fv(0, l, &msg[0])
 		default:
 		}
 		gl.DrawArrays(gl.TRIANGLE_STRIP, 0, 4)
+		checkGLError()
 		window.SwapBuffers()
 		glfw.PollEvents()
+		checkGLError()
 	}
 }
-
-func compileShader(source string, shaderType uint32) (uint32, error) {
-	shader := gl.CreateShader(shaderType)
-
-	csources, free := gl.Strs(source)
-	gl.ShaderSource(shader, 1, csources, nil)
-	free()
-	gl.CompileShader(shader)
-
-	var status int32
-	gl.GetShaderiv(shader, gl.COMPILE_STATUS, &status)
-	if status == gl.FALSE {
-		var logLength int32
-		gl.GetShaderiv(shader, gl.INFO_LOG_LENGTH, &logLength)
-
-		log := strings.Repeat("\x00", int(logLength+1))
-		gl.GetShaderInfoLog(shader, logLength, nil, gl.Str(log))
-
-		return 0, fmt.Errorf("failed to compile %v: %v", source, log)
-	}
-
-	return shader, nil
-}
-
-const testFragmentShader string = `
-#version 330
-out vec4 colorOut;
-
-void main()
-{
-	vec2 res = vec2(1280,720);
-	vec2 q = gl_FragCoord.xy/res.xy;
-    colorOut = vec4(q, 0.0, 1.0);
-}
-` + "\x00"
-
-const singleQuadVertexShader string = `
-#version 300 es
-out vec2 textureCoords;
-
-void main() {
-    const vec2 positions[4] = vec2[](
-        vec2(-1, -1),
-        vec2(+1, -1),
-        vec2(-1, +1),
-        vec2(+1, +1)
-    );
-    const vec2 coords[4] = vec2[](
-        vec2(0, 0),
-        vec2(1, 0),
-        vec2(0, 1),
-        vec2(1, 1)
-    );
-
-    textureCoords = coords[gl_VertexID];
-    gl_Position = vec4(positions[gl_VertexID], 0.0, 1.0);
-}` + "\x00"
