@@ -90,6 +90,17 @@ static int pidPost;
 
 void entrypoint(void)
 {
+#ifdef SU_LOAD_GMDLS
+	su_load_gmdls();
+#endif
+	// Use these lines to dump the data:
+	// FILE* f;
+	// su_render_song(sointu_buffer);
+	// f = fopen("song.raw", "wb");
+	// fwrite((void*)sointu_buffer, sizeof(SUsample), SU_BUFFER_LENGTH, f);
+
+	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)su_render_song, sointu_buffer, 0, 0);
+
 	// initialize window
 	#ifdef WINDOW
 		HWND window = CreateWindow("static", 0, WS_POPUP | WS_VISIBLE, 0, 0, XRES, YRES, 0, 0, 0, 0);
@@ -110,17 +121,7 @@ void entrypoint(void)
 	CHECK_ERRORS();
 #if POST_PASS
 	pidPost = ((PFNGLCREATESHADERPROGRAMVPROC)wglGetProcAddress("glCreateShaderProgramv"))(GL_FRAGMENT_SHADER, 1, &post_frag);
-#endif
-
-#ifdef SU_LOAD_GMDLS
-	su_load_gmdls();
-#endif
-	// Use these lines to dump the data: #include <stdio.h>
-	// FILE* f;
-	// su_render_song(sointu_buffer);
-	// f = fopen("song.raw", "wb");
-	// fwrite((void*)sointu_buffer, sizeof(SUsample), SU_BUFFER_LENGTH, f);*/
-	CreateThread(0, 0, (LPTHREAD_START_ROUTINE)su_render_song, sointu_buffer, 0, 0);	
+#endif	
 	waveOutOpen(&hWaveOut, WAVE_MAPPER, &WaveFMT, NULL, 0, CALLBACK_NULL);
 	waveOutPrepareHeader(hWaveOut, &WaveHDR, sizeof(WaveHDR));
 	waveOutWrite(hWaveOut, &WaveHDR, sizeof(WaveHDR));
