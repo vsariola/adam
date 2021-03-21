@@ -96,7 +96,7 @@ void light(vec3 pos,vec3 dir,vec3 color, float a,float b, float c,float x) {
     uvw.x = uvw.x<0. ? 0. : uvw.x>1.0?1.0:uvw.x;    
     uvw.y = uvw.y<0. ? 0. : uvw.y;
     float beamwidth = 1.+uvw.y*x;                
-    col += color*a*exp(-b*length(o+uvw.x*ba-pos-uvw.y*dir)/beamwidth)/beamwidth/beamwidth*fogMap((o+uvw.y*r)*c)/sqrt(1.-pow(dot(r,dir)/length(dir),2.));
+    col += color*a*exp(-b*length(o+uvw.x*ba-pos-uvw.y*dir)/beamwidth)/beamwidth/beamwidth/beamwidth*fogMap((o+uvw.y*r)*c)/sqrt(1.-pow(dot(r,dir)/length(dir),2.));
 }
 // ----------------
 // PASTE UNTIL HERE
@@ -221,7 +221,7 @@ void main()
         dir.z = 2.-4.*mod(rig,2.);
         dir.xy += dir.yx * vec2(-1.,1.) * syncs[7]*10. + (partIndex >= 20 && partIndex < 28 ? sin(vec2(float(i),float(i+9)) + beat) : vec2(0.));
         pos.x += 15.-float((i+20)/20)*30.;                                    
-        light(pos,dir,secondaryColor,60.,80.,1.,3.);
+        light(pos,dir,secondaryColor,50.,40.,1.,3.);
 
         // front lights
         float angle = float(i)*.07;  
@@ -229,7 +229,7 @@ void main()
             vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),
             vec3(sin(angle),cos(angle),0)+vec3(0.,0.5,-2.),
             primaryColor * (syncs[5]+(part > 28. && part < 32.?1.+sin(part-angle):0.)),
-            60.,80.,1.,20.);
+            60.,40.,1.,20.);
         
         // ceiling lights         
         light(
@@ -237,7 +237,7 @@ void main()
             vec3(float(i)*.1,-3.0,
             sin(beat+float(i*(partIndex >= 20 && partIndex < 28 ? 10 : 1))*.2)*1.0),
             tertiaryColor,
-            150.,80.,1.,10.);
+            150.,30.,1.,4.);
     }   
        
 
