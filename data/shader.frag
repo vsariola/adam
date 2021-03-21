@@ -24,8 +24,8 @@ float fogMap(vec3 p2) {
 
 // iq... I think
 float sdBox( vec3 p, vec3 b ) {
-  vec3 q = abs(p) - b;
-  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+  p = abs(p) - b;
+  return length(max(p,0.0)) + min(max(p.x,max(p.y,p.z)),0.0);
 }
 
 float sdCappedCylinder( vec3 p, float h, float r )
