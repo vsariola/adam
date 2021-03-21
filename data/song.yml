@@ -281,7 +281,7 @@ patch:
           parameters: {color: 2, detune: 48, gain: 16, lfo: 0, phase: 0, shape: 63, stereo: 1, transpose: 66, type: 1, unison: 3}
         - type: oscillator
           id: 158
-          parameters: {color: 2, detune: 78, gain: 16, phase: 0, shape: 64, stereo: 1, transpose: 66, type: 1, unison: 3}
+          parameters: {color: 126, detune: 78, gain: 16, phase: 0, shape: 64, stereo: 1, transpose: 66, type: 1, unison: 3}
         - type: addp
           id: 159
           parameters: {stereo: 1}
@@ -302,7 +302,7 @@ patch:
           parameters: {stereo: 1}
         - type: envelope
           id: 72
-          parameters: {attack: 48, decay: 64, gain: 72, release: 64, stereo: 1, sustain: 64}
+          parameters: {attack: 50, decay: 64, gain: 72, release: 64, stereo: 1, sustain: 64}
         - type: mulp
           id: 73
           parameters: {stereo: 1}
@@ -579,7 +579,7 @@ patch:
           parameters: {stereo: 1}
         - type: compressor
           id: 95
-          parameters: {attack: 16, invgain: 90, ratio: 96, release: 96, stereo: 1, threshold: 114}
+          parameters: {attack: 16, invgain: 90, ratio: 96, release: 64, stereo: 1, threshold: 114}
         - type: mulp
           id: 96
           parameters: {stereo: 1}
