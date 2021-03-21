@@ -65,8 +65,8 @@ vec3 screen(vec2 p) {
     return smoothstep(0.,2.,min(25.-p.x,11.-abs(p.y)))
       * ((part < 40.
             ? float(int(p.x)&int(beat+0.5)%5+int(p.y)&(int(beat))%7)
-            : sdCappedCylinder(vec3(0.,p.x-p.y*.8,p.y+5.),0.,5.) <4.
-                ? 1.
+            : sdCappedCylinder(vec3(0.,p.x-p.y,p.y),0.,0.)<4.
+                ? 3.
                 : 0.
          )*secondaryColor*syncs[2]+syncs[3]*10.);
 }
@@ -76,7 +76,7 @@ float lightRigs(vec3 p) {
     p.x = mod(p.x,30.)-15.;    
     p.z -= 5.;
     p.z = max(mod(-p.z,10.),p.z)-5.;        
-    dist = min(min(min(dist,sdBox(p-vec3(2.7,20.,0.),vec3(0,7.,0))),sdBox(p-vec3(-2.7,20.,0.),vec3(0,7.,0))),min(dist,sdTorus(p.yzx+vec3(-10.,0.,0.),vec2(3.8,0.2))));
+    dist = min(min(min(dist,sdBox(p-vec3(2.7,20.,0.),vec3(.02,7.,.02))),sdBox(p-vec3(-2.7,20.,0.),vec3(.02,7.,.02))),min(dist,sdTorus(p.yzx+vec3(-10.,0.,0.),vec2(3.8,0.2))));
     p.z = max(mod(p.z,10.),p.z)-5.;            
     return min(dist,sdBox(p.xyz+vec3(0,-20.,0.),vec3(20.,0.2,0.2)));
 }
@@ -229,7 +229,7 @@ void main()
             vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),
             vec3(sin(angle),cos(angle),0)+vec3(0.,0.5,-2.),
             primaryColor * (syncs[5]+(part > 28. && part < 32.?1.+sin(part-angle):0.)),
-            60.,40.,1.,20.);
+            60.,50.,1.,3.);
         
         // ceiling lights         
         light(
