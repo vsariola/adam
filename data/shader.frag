@@ -67,8 +67,14 @@ float voronoiPeople( vec3 point )
 
 vec3 screen(vec2 p) {  
     p.y -= 10.;
-    return smoothstep(0.,1.,min(25.-abs(p.x),11.-abs(p.y)))
-      * (float(int(p.x)&int(beat+0.5)%5+int(p.y)&(int(beat))%7)*secondaryColor*syncs[2]+syncs[3]*10.);
+    p.x = abs(p.x);
+    return smoothstep(0.,1.,min(25.-p.x,11.-abs(p.y)))
+      * ((part < 40.
+            ? float(int(p.x)&int(beat+0.5)%5+int(p.y)&(int(beat))%7)
+            : sdCappedCylinder(vec3(0.,p.x-p.y*.8,p.y+5.),0.,5.) <4.
+                ? 1.
+                : 0.
+         )*secondaryColor*syncs[2]+syncs[3]*10.);
 }
 
 float hall(vec3 p) {    
@@ -138,7 +144,7 @@ void main()
         part = (part-43.5)*32.+8.;
     }
     
-    if (part < 8.) {
+     if (part < 8.) {
         o = vec3(0.,10.,beat-55.);
     } else if (part < 28. || (part > 34. && part < 40.)) {    
         float primaryHue = float(part/4.0);
@@ -156,7 +162,7 @@ void main()
         } else if (part < 3.5 || (part > 7. && part < 7.5)) {
             o = vec3(-25.,5.,-24.);
             pitch = -0.5;                
-            yaw = -0.8+partBeat*.05;
+            yaw = -0.8+partBeat*.08;
         } else if (part < 4. || part > 7.) {
             o = vec3(0.,10.,15.-partBeat);
         } else if (part < 5.) {            
@@ -164,7 +170,8 @@ void main()
             pitch = 0.7;            
         } else if (part < 6.) {
             o = vec3(-18.+partBeat*4.,7.+partBeat,-22.); 
-            yaw = partBeat/8.-0.25;
+            yaw = partBeat/8.-0.2;
+            pitch = partBeat/16.-0.3;
         } else {
             o = vec3(-10.,16.,partBeat*4.-20.);
             yaw = -1.5;
@@ -185,7 +192,7 @@ void main()
         secondaryColor = tertiaryColor;
     } else if (part < 44.) {        
         o = vec3(0.,10.,327.-beat);
-        secondaryColor = vec3(1.0,0.,0.) * syncs[2];
+        secondaryColor *= syncs[2];        
 
     } else {
         o = vec3(-25,15.,pattern-97.);  
