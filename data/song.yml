@@ -110,7 +110,7 @@ patch:
       units:
         - type: envelope
           id: 18
-          parameters: {attack: 48, decay: 64, gain: 128, release: 64, stereo: 0, sustain: 0}
+          parameters: {attack: 48, decay: 64, gain: 112, release: 64, stereo: 0, sustain: 0}
         - type: oscillator
           id: 19
           parameters: {color: 0, detune: 64, gain: 128, looplength: 1486, loopstart: 2536, phase: 0, samplestart: 250849, shape: 64, stereo: 0, transpose: 42, type: 1, unison: 0}
