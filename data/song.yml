@@ -528,21 +528,15 @@ patch:
         - type: loadnote
           id: 1105
           parameters: {}
-        - type: send
+        - type: aux
           id: 1106
-          parameters: {amount: 128, port: 0, sendpop: 1, stereo: 0, target: 1100, unit: 0, voice: 0}
+          parameters: {channel: 6, gain: 128, stereo: 0}
     - name: Global
       numvoices: 1
       units:
         - type: in
-          id: 1117
-          parameters: {channel: 4, stereo: 1}
-        - type: compressor
-          id: 1118
-          parameters: {attack: 16, invgain: 128, ratio: 32, release: 56, stereo: 1, threshold: 64}
-        - type: send
-          id: 1124
-          parameters: {amount: 128, port: 0, sendpop: 1, stereo: 1, target: 1121, unit: 0, voice: 0}
+          id: 81
+          parameters: {channel: 0, stereo: 1}
         - type: in
           id: 79
           parameters: {channel: 2, stereo: 1}
@@ -550,15 +544,21 @@ patch:
           id: 80
           parameters: {count: 8, damp: 0, delay: 1, dry: 128, feedback: 96, notetracking: 0, pregain: 40, stereo: 1}
           varargs: [1116, 1188, 1276, 1356, 1422, 1492, 1556, 1618, 1140, 1212, 1300, 1380, 1446, 1516, 1580, 1642]
-        - type: in
-          id: 81
-          parameters: {channel: 0, stereo: 1}
         - type: addp
           id: 90
           parameters: {stereo: 1}
-        - type: receive
-          id: 1121
-          parameters: {stereo: 1}
+        - type: outaux
+          id: 1137
+          parameters: {auxgain: 0, outgain: 128, stereo: 1}
+        - type: in
+          id: 1117
+          parameters: {channel: 4, stereo: 1}
+        - type: compressor
+          id: 1118
+          parameters: {attack: 16, invgain: 128, ratio: 32, release: 56, stereo: 1, threshold: 64}
+        - type: in
+          id: 1124
+          parameters: {channel: 0, stereo: 1}
         - type: mulp
           id: 1125
           parameters: {stereo: 1}
@@ -592,9 +592,9 @@ patch:
         - type: send
           id: 204
           parameters: {amount: 32, port: 4, sendpop: 1, stereo: 0, target: 177, unit: 0, voice: 0}
-        - type: receive
+        - type: in
           id: 1100
-          parameters: {}
+          parameters: {channel: 6, stereo: 0}
         - type: filter
           id: 1107
           parameters: {bandpass: 0, frequency: 2, highpass: 0, lowpass: 1, negbandpass: 0, neghighpass: 0, resonance: 128, stereo: 0}
