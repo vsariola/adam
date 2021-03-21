@@ -62,7 +62,7 @@ float voronoiPeople( vec3 point )
 vec3 screen(vec2 p) {  
     p.y -= 10.;
     p.x = abs(p.x);
-    return smoothstep(0.,1.,min(25.-p.x,11.-abs(p.y)))
+    return smoothstep(0.,2.,min(25.-p.x,11.-abs(p.y)))
       * ((part < 40.
             ? float(int(p.x)&int(beat+0.5)%5+int(p.y)&(int(beat))%7)
             : sdCappedCylinder(vec3(0.,p.x-p.y*.8,p.y+5.),0.,5.) <4.
