@@ -68,7 +68,7 @@ vec3 screen(vec2 p) {
             : sdCappedCylinder(vec3(0.,p.x-p.y,p.y),0.,0.)<4.
                 ? 3.
                 : 0.
-         )*secondaryColor*syncs[2]+syncs[3]*10.);
+         )*secondaryColor*syncs[1]+syncs[3]*10.);
 }
 
 float lightRigs(vec3 p) {
@@ -132,8 +132,8 @@ void main()
      if (part < 8.) {
         o = vec3(0.,10.,beat-55.);
     } else if (part < 28. || (part > 34. && part < 40.)) {    
-        float primaryHue = float(part/4.0);
-        primaryColor = (vec3(cos(primaryHue),cos(primaryHue+2.0),cos(primaryHue+4.0))*.5+.5)*(part > 20. && part < 28. ? pow(1.-mod(syncs[0]/2.,1.),2.) : syncs[2]);
+        float primaryHue = part/4.0;
+        primaryColor = (cos(vec3(primaryHue,primaryHue+2.0,primaryHue+4.0))*.5+.5)*(part > 20. && part < 28. ? pow(1.-mod(syncs[0]/2.,1.),2.) : syncs[1]);
         part = mod(part,8.);
         if (part < 1.) {
             o = vec3(-25,15.,partBeat*4.-21.);  
@@ -177,7 +177,7 @@ void main()
         secondaryColor = tertiaryColor;
     } else if (part < 44.) {        
         o = vec3(0.,10.,327.-beat);
-        secondaryColor *= syncs[2];        
+        secondaryColor *= syncs[1];        
     } else {
         o = vec3(-25,15.,pattern-97.);  
         yaw = -1.2;
@@ -228,7 +228,7 @@ void main()
         light(
             vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.0),
             vec3(sin(angle),cos(angle),0)+vec3(0.,0.5,-2.),
-            primaryColor * (syncs[5]+(part > 28. && part < 32.?1.+sin(part-angle):0.)),
+            primaryColor * (syncs[5]+syncs[2]+(part > 28. && part < 32.?1.+sin(part-angle):0.)),
             60.,50.,1.,3.);
         
         // ceiling lights         

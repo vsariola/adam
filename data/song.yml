@@ -53,9 +53,6 @@ patch:
         - type: envelope
           id: 5
           parameters: {attack: 48, decay: 64, gain: 128, release: 64, stereo: 1, sustain: 64}
-        - type: sync
-          id: 1101
-          parameters: {}
         - type: oscillator
           id: 6
           parameters: {color: 3, detune: 76, gain: 128, phase: 0, shape: 64, stereo: 1, transpose: 42, type: 1, unison: 3}
@@ -142,15 +139,6 @@ patch:
       numvoices: 1
       units:
         - type: envelope
-          id: 154
-          parameters: {attack: 16, decay: 36, gain: 32, release: 0, stereo: 0, sustain: 0}
-        - type: oscillator
-          id: 155
-          parameters: {color: 17, detune: 64, gain: 64, looplength: 2614, loopstart: 2301, phase: 0, samplestart: 171746, shape: 64, stereo: 0, transpose: 82, type: 4}
-        - type: mulp
-          id: 156
-          parameters: {stereo: 0}
-        - type: envelope
           id: 27
           parameters: {attack: 16, decay: 71, gain: 128, release: 0, stereo: 0, sustain: 0}
         - type: sync
@@ -167,9 +155,6 @@ patch:
           parameters: {color: 128, detune: 64, gain: 128, looplength: 1, phase: 64, shape: 68, stereo: 0, transpose: 42, type: 0}
         - type: mulp
           id: 31
-          parameters: {stereo: 0}
-        - type: addp
-          id: 157
           parameters: {stereo: 0}
         - type: filter
           id: 32
@@ -191,7 +176,7 @@ patch:
           parameters: {amount: 100, port: 0, sendpop: 1, stereo: 0, target: 3}
         - type: envelope
           id: 1138
-          parameters: {attack: 48, decay: 54, gain: 128, release: 0, stereo: 0, sustain: 0}
+          parameters: {attack: 48, decay: 52, gain: 128, release: 0, stereo: 0, sustain: 0}
         - type: send
           id: 1139
           parameters: {amount: 24, port: 5, sendpop: 1, stereo: 0, target: 3, unit: 0, voice: 0}
@@ -237,6 +222,9 @@ patch:
         - type: envelope
           id: 53
           parameters: {attack: 0, decay: 66, gain: 128, release: 68, stereo: 0, sustain: 0}
+        - type: sync
+          id: 1101
+          parameters: {}
         - type: noise
           id: 54
           parameters: {gain: 64, shape: 64, stereo: 0}
@@ -369,6 +357,9 @@ patch:
           id: 118
           parameters: {damp: 0, dry: 128, feedback: 96, notetracking: 0, pregain: 40, stereo: 1}
           varargs: [9187]
+        - type: filter
+          id: 1141
+          parameters: {bandpass: 0, frequency: 112, highpass: 1, lowpass: 0, negbandpass: 0, neghighpass: 0, resonance: 128, stereo: 1}
         - type: outaux
           id: 120
           parameters: {auxgain: 128, outgain: 0, stereo: 1}
