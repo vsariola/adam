@@ -2,7 +2,7 @@
 
 uniform float syncs[16];
 out vec4 output;
-vec2 iResolution = vec2(1280.0,720.0);
+vec2 iResolution = vec2(@XRES@,@YRES@);
 
 // PASTE FROM HERE
 // ---------------

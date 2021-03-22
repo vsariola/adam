@@ -22,10 +22,6 @@
 #include <post.inl>
 #endif
 
-// global resolution
-#define XRES 1280
-#define YRES 720
-
 #pragma data_seg(".pixelfmt")
 static const PIXELFORMATDESCRIPTOR pfd = {
 #if BREAK_COMPATIBILITY

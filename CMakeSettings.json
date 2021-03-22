@@ -1,12 +1,12 @@
 ﻿{
   "configurations": [
     {
-      "name": "dev",
+      "name": "dev-1080",
       "generator": "Ninja",
       "configurationType": "Debug",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON  -DCOMPRESS_LEVEL=OFF -DWINDOW=ON trace-source=CMakeLists.txt",
+      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON  -DCOMPRESS_LEVEL=OFF -DWINDOW=ON -DXRES=1920 -DYRES=1080 trace-source=CMakeLists.txt",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
@@ -20,12 +20,12 @@
       "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe"
     },
     {
-      "name": "minified-lightcompress",
+      "name": "min-light-720",
       "generator": "Ninja",
       "configurationType": "MinSizeRel",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=LIGHT trace-source=CMakeLists.txt",
+      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=LIGHT -DXRES=1280 -DYRES=720 trace-source=CMakeLists.txt",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
@@ -33,12 +33,12 @@
       "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe"
     },
     {
-      "name": "minified-mediumcompress",
+      "name": "min-med-720",
       "generator": "Ninja",
       "configurationType": "MinSizeRel",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=MEDIUM trace-source=CMakeLists.txt",
+      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=MEDIUM -DXRES=1280 -DYRES=720 trace-source=CMakeLists.txt",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
@@ -46,39 +46,58 @@
       "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe"
     },
     {
-      "name": "inlined-mediumcompress",
-      "generator": "Ninja",
-      "configurationType": "MinSizeRel",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCOMPRESS_LEVEL=MEDIUM trace-source=CMakeLists.txt",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x86" ],
-      "variables": [],
-      "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe"
-    },
-    {
-      "name": "inlined-highcompress",
-      "generator": "Ninja",
-      "configurationType": "MinSizeRel",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "-DCOMPRESS_LEVEL=HEAVY trace-source=CMakeLists.txt",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x86" ],
-      "variables": [],
-      "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe"
-    },
-    {
-      "name": "minified-heavycompress",
+      "name": "min-heavy-720",
       "generator": "Ninja",
       "configurationType": "MinSizeRel",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe",
-      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=HEAVY trace-source=CMakeLists.txt",
+      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=HEAVY -DXRES=1280 -DYRES=720 trace-source=CMakeLists.txt",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": []
+    },
+    {
+      "name": "dev-720",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe",
+      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON  -DCOMPRESS_LEVEL=OFF -DWINDOW=ON -DXRES=1280 -DYRES=720 trace-source=CMakeLists.txt",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [
+        {
+          "name": "OPENGL_DEBUG",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
+    },
+    {
+      "name": "min-heavy-1080",
+      "generator": "Ninja",
+      "configurationType": "MinSizeRel",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe",
+      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=HEAVY -DXRES=1920 -DYRES=1080 trace-source=CMakeLists.txt",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": []
+    },
+    {
+      "name": "min-med-1080",
+      "generator": "Ninja",
+      "configurationType": "MinSizeRel",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe",
+      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=MEDIUM -DXRES=1920 -DYRES=1080 trace-source=CMakeLists.txt",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],

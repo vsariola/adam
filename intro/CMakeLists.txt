@@ -3,6 +3,12 @@ option(MINIFY_SHADERS "Use shader_minified minified shaders instead of hand-tune
 option(OPENGL_DEBUG "Show OpenGL errors in a message box" OFF)
 set(COMPRESS_LEVEL "medium" CACHE STRING "Crinkler compression level: off, light, medium, heavy")
 set_property(CACHE COMPRESS_LEVEL PROPERTY STRINGS OFF LIGHT MEDIUM HEAVY)
+if (NOT XRES)
+    set(XRES 1920)
+endif()
+if (NOT YRES)
+    set(YRES 1080)
+endif()
  
 message(STATUS "Configuration options (configure with cmake -D...): WINDOW=${WINDOW} MINIFY_SHADERS=${MINIFY_SHADERS} COMPRESS_LEVEL=${COMPRESS_LEVEL}")
 
@@ -32,17 +38,27 @@ if (MINIFY_SHADERS)
     # Generate the minified inlined shaders        
     set(SHADER_FRAG ../data/shader.frag)
     set(POST_FRAG ../data/post.frag)
+    set(SHADER_CONFIGURED_FRAG configured/shader.frag)
+    set(POST_CONFIGURED_FRAG configured/post.frag)
     set(SHADER_MINIFIED_INL minified/shader.inl)
     set(POST_MINIFIED_INL minified/post.inl)
+    configure_file(
+        ${SHADER_FRAG}
+        ${SHADER_CONFIGURED_FRAG}
+    )
+    configure_file(
+        ${POST_FRAG}
+        ${POST_CONFIGURED_FRAG}
+    )
     add_custom_command(
         OUTPUT ${SHADER_MINIFIED_INL}
-        COMMAND ${SHADER_MINIFIER} -o ${CMAKE_CURRENT_BINARY_DIR}/${SHADER_MINIFIED_INL} ${CMAKE_CURRENT_SOURCE_DIR}/${SHADER_FRAG}
-        DEPENDS ${SHADER_FRAG}
+        COMMAND ${SHADER_MINIFIER} -o ${CMAKE_CURRENT_BINARY_DIR}/${SHADER_MINIFIED_INL} ${CMAKE_CURRENT_BINARY_DIR}/${SHADER_CONFIGURED_FRAG}
+        DEPENDS ${SHADER_CONFIGURED_FRAG}
     )
     add_custom_command(
         OUTPUT ${POST_MINIFIED_INL}
-        COMMAND ${SHADER_MINIFIER} -o ${CMAKE_CURRENT_BINARY_DIR}/${POST_MINIFIED_INL} ${CMAKE_CURRENT_SOURCE_DIR}/${POST_FRAG}
-        DEPENDS ${POST_FRAG}
+        COMMAND ${SHADER_MINIFIER} -o ${CMAKE_CURRENT_BINARY_DIR}/${POST_MINIFIED_INL} ${CMAKE_CURRENT_BINARY_DIR}/${POST_CONFIGURED_FRAG}
+        DEPENDS ${POST_CONFIGURED_FRAG}
     )
     set(SHADERS ${SHADER_MINIFIED_INL} ${POST_MINIFIED_INL})
     set(SHADER_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/minified/)    
@@ -53,16 +69,26 @@ endif()
 
 add_executable(intro WIN32 "main.c" ${SONG_ASM} ${SHADERS})
 set_property(TARGET intro APPEND PROPERTY LINK_FLAGS " /ENTRY:entrypoint")                      
+target_compile_definitions(intro PUBLIC XRES=${XRES} YRES=${YRES})
 target_link_libraries(intro opengl32.lib winmm.lib libucrt.lib)
 target_include_directories(intro PUBLIC ${SHADER_INCLUDE_DIR}) # for the shaders
 target_include_directories(intro PUBLIC ${CMAKE_CURRENT_BINARY_DIR}) # for the song
 
+set_target_properties(intro PROPERTIES
+                      RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/dist
+)
+
+set(exename "adam")
+if (NOT YRES EQUAL "1080")
+    set(exename "${exename}-${YRES}")
+endif()
 if (WINDOW)
+    set(exename "${exename}-window")
     message("Defining WINDOW macro")
     target_compile_definitions(intro PUBLIC WINDOW)
 endif()
-
 if (OPENGL_DEBUG)
+    set(exename "${exename}-debug")
     target_compile_definitions(intro PUBLIC OPENGL_DEBUG)
 endif()
 
@@ -81,12 +107,18 @@ if (NOT COMPRESS_LEVEL STREQUAL OFF)
     # TBD: do we add /SATURATE
     if (COMPRESS_LEVEL STREQUAL LIGHT) 
         set(CRINKLER_FLAGS "${CRINKLER_FLAGS} /HASHTRIES:100 /COMPMODE:INSTANT /ORDERTRIES:2000")
+        set(exename "${exename}-light")
     elseif (COMPRESS_LEVEL STREQUAL HEAVY)
-        set(CRINKLER_FLAGS "${CRINKLER_FLAGS} /HASHTRIES:1000 /COMPMODE:VERYSLOW /ORDERTRIES:30000")      
+        set(CRINKLER_FLAGS "${CRINKLER_FLAGS} /HASHTRIES:1000 /COMPMODE:VERYSLOW /ORDERTRIES:30000")              
     else()
         set(CRINKLER_FLAGS "${CRINKLER_FLAGS} /HASHTRIES:300 /COMPMODE:SLOW /ORDERTRIES:9000 /TRUNCATEFLOATS:32")
+        set(exename "${exename}-medium")
     endif()   
     
     # we drop the whole manifest creation from the front; did not find a way to disable it from CMake otherwise        
     set (CMAKE_C_LINK_EXECUTABLE "${CRINKLER} <OBJECTS> /out:<TARGET> ${CRINKLER_FLAGS} <LINK_LIBRARIES>")
+else()
+    set(exename "${exename}-uncompressed")
 endif()
+
+set_target_properties(intro PROPERTIES OUTPUT_NAME ${exename})
