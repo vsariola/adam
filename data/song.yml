@@ -93,15 +93,6 @@ patch:
         - type: outaux
           id: 14
           parameters: {auxgain: 8, outgain: 128, stereo: 1}
-        - type: noise
-          id: 15
-          parameters: {gain: 64, shape: 64, stereo: 0}
-        - type: hold
-          id: 16
-          parameters: {holdfreq: 0, stereo: 0}
-        - type: send
-          id: 17
-          parameters: {amount: 80, port: 0, sendpop: 1, stereo: 0, target: 1}
     - name: Bass
       numvoices: 1
       units:
