@@ -131,7 +131,7 @@ patch:
       units:
         - type: envelope
           id: 27
-          parameters: {attack: 16, decay: 70, gain: 128, release: 32, stereo: 0, sustain: 0}
+          parameters: {attack: 16, decay: 71, gain: 128, release: 32, stereo: 0, sustain: 0}
         - type: sync
           id: 197
           parameters: {}
@@ -140,10 +140,10 @@ patch:
           parameters: {drive: 120, stereo: 0}
         - type: send
           id: 1140
-          parameters: {amount: 16, port: 4, sendpop: 0, stereo: 0, target: 18, unit: 0, voice: 0}
+          parameters: {amount: 24, port: 4, sendpop: 0, stereo: 0, target: 18, unit: 0, voice: 0}
         - type: oscillator
           id: 3
-          parameters: {color: 128, detune: 64, gain: 128, looplength: 1, phase: 62, shape: 64, stereo: 0, transpose: 42, type: 0}
+          parameters: {color: 128, detune: 64, gain: 128, looplength: 1, phase: 80, shape: 64, stereo: 0, transpose: 42, type: 0}
         - type: mulp
           id: 31
           parameters: {stereo: 0}
@@ -254,7 +254,7 @@ patch:
           parameters: {panning: 70, stereo: 0}
         - type: outaux
           id: 67
-          parameters: {auxgain: 0, outgain: 32, stereo: 1}
+          parameters: {auxgain: 0, outgain: 48, stereo: 1}
     - name: Supersaw
       numvoices: 1
       units:
@@ -541,17 +541,29 @@ patch:
         - type: in
           id: 1117
           parameters: {channel: 4, stereo: 1}
+        - type: push
+          id: 1149
+          parameters: {stereo: 1}
+        - type: filter
+          id: 1145
+          parameters: {bandpass: 0, frequency: 64, highpass: 1, lowpass: 0, negbandpass: 0, neghighpass: 0, resonance: 128, stereo: 1}
         - type: compressor
           id: 1118
-          parameters: {attack: 16, invgain: 128, ratio: 64, release: 48, stereo: 1, threshold: 64}
+          parameters: {attack: 16, invgain: 128, ratio: 64, release: 54, stereo: 1, threshold: 48}
         - type: in
           id: 1124
           parameters: {channel: 0, stereo: 1}
         - type: mulp
           id: 1125
           parameters: {stereo: 1}
+        - type: xch
+          id: 1150
+          parameters: {stereo: 1}
+        - type: pop
+          id: 1151
+          parameters: {stereo: 1}
         - type: addp
-          id: 1126
+          id: 1152
           parameters: {stereo: 1}
         - type: filter
           id: 1132
@@ -564,7 +576,7 @@ patch:
           parameters: {stereo: 1}
         - type: compressor
           id: 1129
-          parameters: {attack: 24, invgain: 128, ratio: 112, release: 57, stereo: 1, threshold: 128}
+          parameters: {attack: 16, invgain: 128, ratio: 48, release: 48, stereo: 1, threshold: 128}
         - type: mulp
           id: 96
           parameters: {stereo: 1}
