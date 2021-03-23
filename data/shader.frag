@@ -76,7 +76,7 @@ float lightRigs(vec3 p) {
 }
 
 float stage(vec3 p) {    
-    float dist = min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),sdCappedCylinder(p.xzy-vec3(0,24,2),4.,2.)+.4*sin(p.y));
+    float dist = min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4.,2.)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2.)));
     p.x = mod(p.x,40.)-20.;            
     return min(min(dist,sdBox(p-vec3(0,0,20),vec3(2,15,1))),p.y<1.0?voronoiPeople(p):p.y-0.7);
 }
