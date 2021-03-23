@@ -24,13 +24,13 @@ float fogMap(vec3 p2) {
 // iq... I think
 float sdBox( vec3 p, vec3 b ) {
   p = abs(p) - b;
-  return length(max(p,0.0)) + min(max(p.x,max(p.y,p.z)),0.0);
+  return length(max(p,.0)) + min(max(p.x,max(p.y,p.z)),.0);
 }
 
 float sdCappedCylinder( vec3 p, float h, float r )
 {
   vec2 d = abs(vec2(length(p.xy),p.z)) - vec2(h,r);
-  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+  return min(max(d.x,d.y),.0) + length(max(d,.0));
 }
 
 float sdTorus( vec3 p, vec2 t )
@@ -47,7 +47,7 @@ float voronoiPeople( vec3 point )
     for( int i=0; i<4; i++ )
     {
         ivec2 b = ivec2(i%2, i/2);                        
-        res = min(sdCappedCylinder(vec3(vec2(b) - f + sin(sin(mat2(127.1,311.7,269.5,183.3)*vec2(p + b))*43758.+syncs[1])*.5+.5,point.y),0.05,0.7)-0.05,res);        
+        res = min(sdCappedCylinder(vec3(vec2(b) - f + sin(sin(mat2(127.1,311.7,269.5,183.3)*vec2(p + b))*43758.+syncs[1])*.5+.5,point.y),.05,.7)-.05,res);        
     }
 
     return res;
@@ -58,7 +58,7 @@ vec3 screen(vec2 p) {
     p.x = abs(p.x);
     return smoothstep(0.,2.,min(25.-p.x,11.-abs(p.y)))
       * ((part < 40.
-            ? float(int(p.x)&int(beat+0.5)%5+int(p.y)&(int(beat))%7)
+            ? float(int(p.x)&int(beat+.5)%5+int(p.y)&(int(beat))%7)
             : sdCappedCylinder(vec3(0,p.x-p.y,p.y),0.,0)<4.
                 ? 3.
                 : 0.
@@ -78,7 +78,7 @@ float lightRigs(vec3 p) {
 float stage(vec3 p) {    
     float dist = min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4.,2.)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2.)));
     p.x = mod(p.x,40.)-20.;            
-    return min(min(dist,sdBox(p-vec3(0,0,20),vec3(2,15,1))),p.y<1.0?voronoiPeople(p):p.y-0.7);
+    return min(min(dist,sdBox(p-vec3(0,0,20),vec3(2,15,1))),p.y<1.0?voronoiPeople(p):p.y-.7);
 }
 
 // Calculates the distance from a ray (o + r*d) to a line segment between points a & b
@@ -139,8 +139,8 @@ void main()
             pitch = -.7+partBeat*.05;        
         } else if (part < 3.5 || (part > 7. && part < 7.5)) {
             o = vec3(-25,5,-24);
-            pitch = -0.5;                
-            yaw = -0.8+partBeat*.08;
+            pitch = -.5;                
+            yaw = -.8+partBeat*.08;
         } else if (part < 4. || part > 7.) {
             o = vec3(0,10,15.-partBeat);
         } else if (part < 5.) {            
@@ -148,8 +148,8 @@ void main()
             pitch = .7;            
         } else if (part < 6.) {
             o = vec3(-18.+partBeat*4.,7.+partBeat,-22.); 
-            yaw = partBeat/8.-0.2;
-            pitch = partBeat/16.-0.3;
+            yaw = partBeat/8.-.2;
+            pitch = partBeat/16.-.3;
         } else {
             o = vec3(-10,16,partBeat*4.-20.);
             yaw = -1.5;
@@ -177,7 +177,7 @@ void main()
         pitch = .4;
     }
     
-    //yaw += fogMap(o/2.)*0.02-0.01;
+    //yaw += fogMap(o/2.)*.02-.01;
         
     r.yz = mat2(cos(pitch),sin(pitch),-sin(pitch),cos(pitch)) * r.yz;    
     r.xz = mat2(cos(yaw),sin(yaw),-sin(yaw),cos(yaw)) * r.xz;           
@@ -187,20 +187,20 @@ void main()
     for (int i = 0;i < 199;i++) {        
         p = o + r * d;
         vec2 w = vec2( -sdBox(vec3(p.xy-vec2(0,9.5),0),vec3(2,3,15)), abs(p.z+40.) - 15. );    
-        float b = min(min(min(min(min(max(w.x,w.y),0.0) + length(max(w,0.0)),-sdCappedCylinder(p+vec3(0,10,15),40.,40.)),p.y),lightRigs(p)),stage(p)); 
-        if (b < 0.01 || d > 70.0) {                
+        float b = min(min(min(min(min(max(w.x,w.y),0.) + length(max(w,0.)),-sdCappedCylinder(p+vec3(0,10,15),40.,40.)),p.y),lightRigs(p)),stage(p)); 
+        if (b < .01 || d > 70.) {                
             break;
         }                      
-        d += b * (p.y < 2.?0.1:1.);                
+        d += b * (p.y < 2.?.1:1.);                
     }          
                 
-    for (float d2=d;d2>0.;d2-=0.5) {              
+    for (float d2=d;d2>0.;d2-=.5) {              
         p = o + r * d2;              
-        col += ((vec3(.007)+smoothstep(0.,1.,40.*clamp((pattern-64.)/16.,0.,1.)-abs(p.x-p.y+29.))*pow(p.y/15.,4.)*vec3(.4,.36,.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25.)) * 0.03 * min(d2,0.5);        
+        col += ((vec3(.007)+smoothstep(0.,1.,40.*clamp((pattern-64.)/16.,0.,1.)-abs(p.x-p.y+29.))*pow(p.y/15.,4.)*vec3(.4,.36,.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25.)) * .03 * min(d2,.5);        
     }
         
     // lasers
-    if (syncs[4] > 0.0)        
+    if (syncs[4] > 0.)        
         for (int i = 0;i < 150;i++) {    
             float angle = float(i/30-2)/1.9;              
             light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.),vec3(sin(float(i)+beat*1000.),.1,-2.),vec3(.2,1,.1),.5,50.,3.,0.);
@@ -209,7 +209,7 @@ void main()
     for (int i = -20;i < 21;i++) {             
         // round lightrigs hanging from the ceiling
         float rig = float((int((partIndex>7&&partIndex<40?beat:3.)))%4-2);
-        vec3 dir = vec3(cos((float(i)+0.5)*6.28/20.),sin((float(i)+0.5)*6.28/20.),0.);
+        vec3 dir = vec3(cos((float(i)+.5)*6.28/20.),sin((float(i)+.5)*6.28/20.),0.);
         vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
         dir.z = 2.-4.*mod(rig,2.);
         dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15. + (partIndex >= 20 && partIndex < 28 ? sin(vec2(float(i),float(i+9)) + beat) : vec2(0));
@@ -237,5 +237,5 @@ void main()
     // ----------------
     // PASTE UNTIL HERE
     // Output to screen     
-    output = vec4(sqrt(col * 5.),1.0) * smoothstep(0.,1.0,min(pattern,(94.-pattern))/8.);
+    output = vec4(sqrt(col * 5.),1.) * smoothstep(0.,1.0,min(pattern,(94.-pattern))/8.);
 }
