@@ -201,18 +201,8 @@ patch:
         - type: mulp
           id: 48
           parameters: {stereo: 0}
-        - type: envelope
-          id: 49
-          parameters: {attack: 0, decay: 48, gain: 128, release: 0, stereo: 0, sustain: 0}
-        - type: oscillator
-          id: 50
-          parameters: {color: 64, detune: 64, gain: 128, phase: 96, shape: 96, stereo: 0, transpose: 66, type: 1}
-        - type: mulp
-          id: 51
-          parameters: {stereo: 0}
-        - type: addp
-          id: 52
-          parameters: {stereo: 0}
+        - id: 1154
+          parameters: {}
         - type: envelope
           id: 53
           parameters: {attack: 0, decay: 66, gain: 128, release: 68, stereo: 0, sustain: 0}
@@ -231,6 +221,8 @@ patch:
         - type: addp
           id: 57
           parameters: {stereo: 0}
+        - id: 1155
+          parameters: {}
         - type: envelope
           id: 58
           parameters: {attack: 0, decay: 65, gain: 48, release: 70, stereo: 0, sustain: 0}
