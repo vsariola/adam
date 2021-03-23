@@ -16,7 +16,7 @@ float fogMap(vec3 p2) {
     vec3 s=vec3(7,157,113);
     vec4 h=vec4(0,s.yz,s.y+s.z)+dot(ip,s);
     p=p*p*(3.-2.*p); 
-    h=mix(fract(sin(h)*43758.5),fract(sin(h+s.x)*43758.5),p.x);
+    h=mix(fract(sin(h)*99.),fract(sin(h+s.x)*99.),p.x);
     h.xy=mix(h.xz,h.yw,p.y);
     return mix(h.x,h.y,p.z)*15./(p2.y+15.);
 }
@@ -43,11 +43,11 @@ float voronoiPeople( vec3 point )
     ivec2 p = ivec2(floor( point.xz ));
     vec2  f = fract(point.xz );
 
-    float res = 8.0;
+    float res = 8.;
     for( int i=0; i<4; i++ )
     {
         ivec2 b = ivec2(i%2, i/2);                        
-        res = min(sdCappedCylinder(vec3(vec2(b) - f + sin(sin(mat2(127.1,311.7,269.5,183.3)*vec2(p + b))*43758.+syncs[1])*.5+.5,point.y),.05,.7)-.05,res);        
+        res = min(sdCappedCylinder(vec3(vec2(b) - f + sin(sin(mat2(127.1,311.7,269.5,183.3)*vec2(p + b))*99.+syncs[1])*.5+.5,point.y),.05,.7)-.05,res);        
     }
 
     return res;
@@ -78,7 +78,7 @@ float lightRigs(vec3 p) {
 float stage(vec3 p) {    
     float dist = min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4.,2.)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2.)));
     p.x = mod(p.x,40.)-20.;            
-    return min(min(dist,sdBox(p-vec3(0,0,20),vec3(2,15,1))),p.y<1.0?voronoiPeople(p):p.y-.7);
+    return min(min(dist,sdBox(p-vec3(0,0,20),vec3(2,15,1))),p.y<1.?voronoiPeople(p):p.y-.7);
 }
 
 // Calculates the distance from a ray (o + r*d) to a line segment between points a & b
@@ -111,18 +111,14 @@ void main()
     primaryColor = vec3(1);
     if (part > 4. && part < 44.) {
         secondaryColor = vec3(3,.6,.75);    
-    }    
-
-    // Normalized pixel coordinates (from 0 to 1)
-    
-    if (part > 43. && part < 43.5) {
-        part = (part-43.)*16.+8.;
+        if (part > 43.) {
+            part = (part-42.5)*16.;
+            if (part > 16.) {
+                part = (part-12.)*2.;
+            }
+        }
     }
 
-    if (part > 43.5 && part < 44.) {
-        part = (part-43.5)*32.+8.;
-    }
-    
      if (part < 8.) {
         o = vec3(0,10,beat-55.);
     } else if (part < 28. || (part > 34. && part < 40.)) {    
@@ -237,5 +233,5 @@ void main()
     // ----------------
     // PASTE UNTIL HERE
     // Output to screen     
-    output = vec4(sqrt(col * 5.),1.) * smoothstep(0.,1.0,min(pattern,(94.-pattern))/8.);
+    output = vec4(sqrt(col * 5.),1) * smoothstep(0.,1.,min(pattern,(94.-pattern))/8.);
 }
