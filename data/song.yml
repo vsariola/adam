@@ -128,7 +128,7 @@ patch:
       units:
         - type: envelope
           id: 27
-          parameters: {attack: 54, decay: 69, gain: 128, release: 32, stereo: 0, sustain: 0}
+          parameters: {attack: 32, decay: 69, gain: 128, release: 32, stereo: 0, sustain: 0}
         - type: sync
           id: 197
           parameters: {}
