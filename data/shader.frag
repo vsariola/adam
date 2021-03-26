@@ -8,7 +8,7 @@ vec2 iResolution = vec2(@XRES@,@YRES@);
 // ---------------
 float beat,pattern,part,partBeat,yaw,pitch,d;
 vec3 col,o,r,primaryColor,secondaryColor,tertiaryColor;
-int partIndex;
+int partIndex,i;
 
 float fogMap(vec3 p2) {
     vec3 p = p2/3.,ip=floor(p);
@@ -44,7 +44,7 @@ float voronoiPeople( vec3 point )
     vec2  f = fract(point.xz );
 
     float res = 8.;
-    for( int i=0; i<4; i++ )
+    for(i=0; i<4; i++ )
     {
         ivec2 b = ivec2(i%2, i/2);                        
         res = min(sdCappedCylinder(vec3(vec2(b) - f + sin(sin(mat2(127.1,311.7,269.5,183.3)*vec2(p + b))*99.+syncs[1])*.5+.5,point.y),.05,.7)-.05,res);        
@@ -143,7 +143,7 @@ void main()
             o = vec3(0,22,partBeat*4.-24.);            
             pitch = .7;            
         } else if (part < 6.) {
-            o = vec3(-18.+partBeat*4.,7.+partBeat,-22.); 
+            o = vec3(-18.+partBeat*4.,7.+partBeat,-22); 
             yaw = partBeat/8.-.2;
             pitch = partBeat/16.-.3;
         } else {
@@ -180,7 +180,7 @@ void main()
     
     vec3 p;    
     
-    for (int i = 0;i < 199;i++) {        
+    for (i = 0;i < 199;i++) {        
         p = o + r * d;
         vec2 w = vec2( -sdBox(vec3(p.xy-vec2(0,9.5),0),vec3(2,3,15)), abs(p.z+40.) - 15. );    
         float b = min(min(min(min(min(max(w.x,w.y),0.) + length(max(w,0.)),-sdCappedCylinder(p+vec3(0,10,15),40.,40.)),p.y),lightRigs(p)),stage(p)); 
@@ -197,16 +197,16 @@ void main()
         
     // lasers
     if (syncs[4] > 0.)        
-        for (int i = 0;i < 150;i++) {    
+        for (i = 0;i < 150;i++) {    
             float angle = float(i/30-2)/1.9;              
-            light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19.),vec3(sin(float(i)+beat*1000.),.1,-2.),vec3(.2,1,.1),.5,50.,3.,0.);
+            light(vec3(sin(angle),cos(angle),0)*15.+vec3(0,0,19),vec3(sin(float(i)+beat*1000.),.1,-2.),vec3(.2,1,.1),.5,50.,3.,0.);
         }           
                 
-    for (int i = -20;i < 21;i++) {             
+    for (i = -20;i < 21;i++) {             
         // round lightrigs hanging from the ceiling
         float rig = float((int((partIndex>7&&partIndex<40?beat:3.)))%4-2);
-        vec3 dir = vec3(cos((float(i)+.5)*6.28/20.),sin((float(i)+.5)*6.28/20.),0.);
-        vec3 pos = dir * 4. + vec3(0.,10.,rig*10.);                                   
+        vec3 dir = vec3(cos((float(i)+.5)*.314),sin((float(i)+.5)*.314),0.);
+        vec3 pos = dir * 4. + vec3(0,10,rig*10.);                                   
         dir.z = 2.-4.*mod(rig,2.);
         dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15. + (partIndex >= 20 && partIndex < 28 ? sin(vec2(float(i),float(i+9)) + beat) : vec2(0));
         pos.x += 15.-float((i+20)/20)*30.;                                    
@@ -223,7 +223,7 @@ void main()
         // ceiling lights         
         light(
             vec3(float(i),20,-15. + float((int(pattern)+i/4)%3)*10.),
-            vec3(float(i)*.1,-3.,
+            vec3(float(i)*.1,-3,
             sin(beat+float(i*(partIndex >= 20 && partIndex < 28 ? 10 : 1))*.2)),
             tertiaryColor,
             150.,30.,1.,4.);
