@@ -24,7 +24,7 @@ add_custom_command(
 )
 
 set(SHADER_HANDTUNED_INL shader.inl)
-set(POST_HANDTUNED_INL post.inl)
+
 if (MINIFY_SHADERS)
     find_program(SHADER_MINIFIER NAMES shader_minifier)
     if (NOT SHADER_MINIFIER)
@@ -36,34 +36,22 @@ endif()
 if (MINIFY_SHADERS)
     message(STATUS "Shader_minifier found at: ${SHADER_MINIFIER}")      
     # Generate the minified inlined shaders        
-    set(SHADER_FRAG ../data/shader.frag)
-    set(POST_FRAG ../data/post.frag)
-    set(SHADER_CONFIGURED_FRAG configured/shader.frag)
-    set(POST_CONFIGURED_FRAG configured/post.frag)
-    set(SHADER_MINIFIED_INL minified/shader.inl)
-    set(POST_MINIFIED_INL minified/post.inl)
+    set(SHADER_FRAG ../data/shader.frag)    
+    set(SHADER_CONFIGURED_FRAG configured/shader.frag)    
+    set(SHADER_MINIFIED_INL minified/shader.inl)    
     configure_file(
         ${SHADER_FRAG}
         ${SHADER_CONFIGURED_FRAG}
-    )
-    configure_file(
-        ${POST_FRAG}
-        ${POST_CONFIGURED_FRAG}
-    )
+    )    
     add_custom_command(
         OUTPUT ${SHADER_MINIFIED_INL}
         COMMAND ${SHADER_MINIFIER} -o ${CMAKE_CURRENT_BINARY_DIR}/${SHADER_MINIFIED_INL} ${CMAKE_CURRENT_BINARY_DIR}/${SHADER_CONFIGURED_FRAG}
         DEPENDS ${SHADER_CONFIGURED_FRAG}
-    )
-    add_custom_command(
-        OUTPUT ${POST_MINIFIED_INL}
-        COMMAND ${SHADER_MINIFIER} -o ${CMAKE_CURRENT_BINARY_DIR}/${POST_MINIFIED_INL} ${CMAKE_CURRENT_BINARY_DIR}/${POST_CONFIGURED_FRAG}
-        DEPENDS ${POST_CONFIGURED_FRAG}
-    )
-    set(SHADERS ${SHADER_MINIFIED_INL} ${POST_MINIFIED_INL})
+    )    
+    set(SHADERS ${SHADER_MINIFIED_INL})
     set(SHADER_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/minified/)    
 else()
-    set(SHADERS ${SHADER_HANDTUNED_INL} ${POST_HANDTUNED_INL})
+    set(SHADERS ${SHADER_HANDTUNED_INL})
     set(SHADER_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
