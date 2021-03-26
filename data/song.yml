@@ -200,7 +200,7 @@ patch:
           parameters: {}
         - type: envelope
           id: 83
-          parameters: {attack: 32, decay: 66, gain: 64, release: 66, stereo: 0, sustain: 0}
+          parameters: {attack: 32, decay: 64, gain: 64, release: 66, stereo: 0, sustain: 0}
         - type: distort
           id: 89
           parameters: {drive: 32, stereo: 0}
@@ -256,7 +256,7 @@ patch:
           parameters: {}
         - type: envelope
           id: 1176
-          parameters: {attack: 0, decay: 70, gain: 128, release: 70, stereo: 0, sustain: 0}
+          parameters: {attack: 48, decay: 70, gain: 128, release: 70, stereo: 0, sustain: 0}
         - type: sync
           id: 1174
           parameters: {}
