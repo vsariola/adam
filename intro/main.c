@@ -2,6 +2,7 @@
 #define USE_MIPMAPS  1
 #define FAIL_KILL true
 #define PID_QUALIFIER const
+#define SYNC_DELAY 16384 // should be power of 2
 
 // minify windows.h
 #define WIN32_LEAN_AND_MEAN
@@ -52,7 +53,7 @@ static DEVMODE screenSettings = {
 
 #pragma data_seg(".sointu_buffer")
 SUsample sointu_buffer[SU_BUFFER_LENGTH];
-float syncBuf[SU_SYNCBUFFER_LENGTH];
+float syncBuf[(SYNC_DELAY >> 8) * SU_NUMSYNCS + SU_SYNCBUFFER_LENGTH];
 HWAVEOUT hWaveOut;
 
 #pragma data_seg(".wavefmt")
@@ -149,8 +150,9 @@ void entrypoint(void)
 		//f[0] = (float)MMTime.u.sample / 44100.0f / 60.0f * 144.0f;		
 		//f[1] = fmod(f[0], 1.0f);
 		// add some offset to time to account for the lag in wave out
-		((PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv"))(0, 16, &syncBuf[((MMTime.u.sample+16384) >> 8) * SU_NUMSYNCS]);
+		((PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv"))(0, 16, &syncBuf[((MMTime.u.sample + SYNC_DELAY) >> 8) * SU_NUMSYNCS]);
 		CHECK_ERRORS();
+	
 
 		glRects(-1, -1, 1, 1);
 		CHECK_ERRORS();
