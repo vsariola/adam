@@ -59,7 +59,7 @@ vec3 screen(vec2 p) {
     return smoothstep(0.,2.,min(25.-p.x,11.-abs(p.y)))
       * ((part < 40.
             ? float(int(p.x)&int(beat+.5)%5+int(p.y)&(int(beat))%7)
-            : sdCappedCylinder(vec3(0,p.x-p.y,p.y),0,0)<4.
+            : sdCappedCylinder(vec3(0,p.x-p.y*.8,p.y+.5),0,0)<4.
                 ? 3.
                 : 0.
          )*secondaryColor*syncs[1]+syncs[3]*10.);
