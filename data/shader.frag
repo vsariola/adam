@@ -86,11 +86,10 @@ float stage(vec3 p) {
 
 void light(vec3 pos,vec3 dir,vec3 color, float a,float b, float c,float x) {
     vec3 ba = r*d;
-    vec3 uvw = inverse(mat3(ba,-dir,cross(ba,dir)))*(pos-o);
-    uvw.x = uvw.x<0. ? 0. : uvw.x>1.?1.:uvw.x;    
-    uvw.y = uvw.y<0. ? 0. : uvw.y;
+    vec3 uvw = inverse(mat3(ba,-dir,cross(ba,dir)))*(pos-o);  
+    uvw.y = max(uvw.y,0.);
     float beamwidth = 1.+uvw.y*x;                
-    col += color*a*exp(-b*length(o+uvw.x*ba-pos-uvw.y*dir)/beamwidth)/beamwidth/beamwidth/beamwidth*fogMap((o+uvw.y*r)*c)/sqrt(1.-pow(dot(r,dir)/length(dir),2.));
+    col += color*a*exp(-b*length(o+clamp(uvw.x,0.,1.)*ba-pos-uvw.y*dir)/beamwidth)/beamwidth/beamwidth/beamwidth*fogMap((o+uvw.y*r)*c)/sqrt(1.-pow(dot(r,dir)/length(dir),2.));
 }
 // ----------------
 // PASTE UNTIL HERE
