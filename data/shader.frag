@@ -206,10 +206,9 @@ void main()
         // round lightrigs hanging from the ceiling
         float rig = float((int((partIndex>7&&partIndex<40?beat:3.)))%4-2);
         vec3 dir = vec3(cos((float(i)+.5)*.314),sin((float(i)+.5)*.314),0.);
-        vec3 pos = dir * 4. + vec3(0,10,rig*10.);                                   
+        vec3 pos = dir * 4. + vec3(15.-float((i+20)/20)*30.,10,rig*10.);                                   
         dir.z = 2.-4.*mod(rig,2.);
-        dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15. + (partIndex >= 20 && partIndex < 28 ? sin(vec2(float(i),float(i+9)) + beat) : vec2(0));
-        pos.x += 15.-float((i+20)/20)*30.;                                    
+        dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15. + (partIndex >= 20 && partIndex < 28 ? sin(vec2(float(i),float(i+9)) + beat) : vec2(0));                                   
         light(pos,dir,secondaryColor,50.,40.,1.,3.);
 
         // front lights
