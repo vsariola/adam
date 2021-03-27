@@ -107,7 +107,7 @@ patch:
           parameters: {stereo: 0}
         - type: outaux
           id: 23
-          parameters: {auxgain: 0, outgain: 40, stereo: 1}
+          parameters: {auxgain: 0, outgain: 36, stereo: 1}
         - id: 1181
           parameters: {}
         - type: envelope
@@ -124,7 +124,7 @@ patch:
       units:
         - type: envelope
           id: 27
-          parameters: {attack: 32, decay: 69, gain: 128, release: 32, stereo: 0, sustain: 0}
+          parameters: {attack: 40, decay: 69, gain: 128, release: 32, stereo: 0, sustain: 0}
         - type: sync
           id: 197
           parameters: {}
@@ -161,7 +161,7 @@ patch:
           parameters: {panning: 64, stereo: 0}
         - type: aux
           id: 37
-          parameters: {channel: 4, gain: 128, stereo: 1}
+          parameters: {channel: 4, gain: 96, stereo: 1}
         - id: 1182
           parameters: {}
         - type: envelope
@@ -290,7 +290,7 @@ patch:
           parameters: {stereo: 1}
         - type: envelope
           id: 72
-          parameters: {attack: 50, decay: 64, gain: 72, release: 64, stereo: 1, sustain: 64}
+          parameters: {attack: 50, decay: 64, gain: 96, release: 64, stereo: 1, sustain: 64}
         - type: mulp
           id: 73
           parameters: {stereo: 1}
@@ -423,7 +423,7 @@ patch:
           parameters: {bandpass: 0, frequency: 32, highpass: 1, lowpass: 0, negbandpass: 0, neghighpass: 0, resonance: 128, stereo: 1}
         - type: outaux
           id: 138
-          parameters: {auxgain: 24, outgain: 0, stereo: 1}
+          parameters: {auxgain: 32, outgain: 0, stereo: 1}
         - id: 1186
           parameters: {}
         - type: envelope
@@ -478,7 +478,7 @@ patch:
       units:
         - type: envelope
           id: 183
-          parameters: {attack: 64, decay: 64, gain: 72, release: 64, stereo: 0, sustain: 64}
+          parameters: {attack: 64, decay: 64, gain: 76, release: 64, stereo: 0, sustain: 64}
         - type: oscillator
           id: 184
           parameters: {color: 128, detune: 64, gain: 128, looplength: 67, loopstart: 1007, phase: 0, samplestart: 806305, shape: 64, stereo: 0, transpose: 90, type: 0}
@@ -514,7 +514,7 @@ patch:
       units:
         - type: envelope
           id: 29
-          parameters: {attack: 48, decay: 48, gain: 48, release: 0, stereo: 0, sustain: 0}
+          parameters: {attack: 48, decay: 48, gain: 80, release: 0, stereo: 0, sustain: 0}
         - type: sync
           id: 1104
           parameters: {}
