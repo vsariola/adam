@@ -6,7 +6,7 @@ vec2 iResolution = vec2(@XRES@,@YRES@);
 
 // PASTE FROM HERE
 // ---------------
-float beat,pattern,part,partBeat,yaw,pitch,d;
+float beat,pattern,part,partBeat,yaw,pitch,d,d2;
 vec3 col,o,r,primaryColor,secondaryColor,tertiaryColor;
 int partIndex,i;
 
@@ -59,7 +59,7 @@ vec3 screen(vec2 p) {
     return smoothstep(0.,2.,min(25.-p.x,11.-abs(p.y)))
       * ((part < 40.
             ? float(int(p.x)&int(beat+.5)%5+int(p.y)&(int(beat))%7)
-            : sdCappedCylinder(vec3(0,p.x-p.y,p.y),0.,0)<4.
+            : sdCappedCylinder(vec3(0,p.x-p.y,p.y),0,0)<4.
                 ? 3.
                 : 0.
          )*secondaryColor*syncs[1]+syncs[3]*10.);
@@ -76,7 +76,7 @@ float lightRigs(vec3 p) {
 }
 
 float stage(vec3 p) {    
-    float dist = min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4.,2.)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2.)));
+    float dist = min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4,2)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2)));
     p.x = mod(p.x,40.)-20.;            
     return min(min(dist,sdBox(p-vec3(0,0,20),vec3(2,15,1))),p.y<1.?voronoiPeople(p):p.y-.7);
 }
@@ -121,7 +121,7 @@ void main()
      if (part < 8.) {
         o = vec3(0,10,beat-55.);
     } else if (part < 28. || (part > 34. && part < 40.)) {    
-        primaryColor = part < 20. ? vec3(.3,.6,3)*syncs[1] : part < 28. ? vec3(1,.3,3)*pow(1.-mod(syncs[0]/2.,1.),2.) : vec3(3,.6,.3)*syncs[1];  
+        primaryColor = part < 20. ? vec3(.3,1,3)*syncs[1] : part < 28. ? vec3(2,.3,3)*pow(1.-mod(syncs[0]/2.,1.),2.) : vec3(3,2,1)*syncs[1];  
         part = mod(part,8.);
         if (part < 1.) {
             o = vec3(-25,15,partBeat*4.-21.);  
@@ -182,11 +182,11 @@ void main()
     for (i = 0;i < 199;i++) {        
         p = o + r * d;
         vec2 w = vec2( -sdBox(vec3(p.xy-vec2(0,9.5),0),vec3(2,3,15)), abs(p.z+40.) - 15. );    
-        float b = min(min(min(min(min(max(w.x,w.y),0.) + length(max(w,0.)),-sdCappedCylinder(p+vec3(0,10,15),40.,40.)),p.y),lightRigs(p)),stage(p)); 
+        float b = min(min(min(min(min(max(w.x,w.y),0.) + length(max(w,0.)),-sdCappedCylinder(p+vec3(0,10,15),40,40)),p.y),lightRigs(p)),stage(p)); 
         if (b < .01 || d > 70.) {                
             break;
         }                      
-        d += b * (p.y < 2.?.1:1.);                
+        d += b * (p.y < 2.?.1:1.);               
     }          
                 
     for (float d2=d;d2>0.;d2-=.5) {              
