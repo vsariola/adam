@@ -24,13 +24,13 @@ float fogMap(vec3 p2) {
 // iq... I think
 float sdBox( vec3 p, vec3 b ) {
   p = abs(p) - b;
-  return length(max(p,.0)) + min(max(p.x,max(p.y,p.z)),.0);
+  return length(max(p,0.)) + min(max(p.x,max(p.y,p.z)),0.);
 }
 
 float sdCappedCylinder( vec3 p, float h, float r )
 {
   vec2 d = abs(vec2(length(p.xy),p.z)) - vec2(h,r);
-  return min(max(d.x,d.y),.0) + length(max(d,.0));
+  return min(max(d.x,d.y),0.) + length(max(d,0.));
 }
 
 float sdTorus( vec3 p, vec2 t )
