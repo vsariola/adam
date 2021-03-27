@@ -1,4 +1,4 @@
-#version 400
+#version 330
 
 uniform float syncs[16];
 out vec4 outcolor;
