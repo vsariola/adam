@@ -1,7 +1,7 @@
 #version 400
 
 uniform float syncs[16];
-out vec4 output;
+out vec4 outcolor;
 vec2 iResolution = vec2(@XRES@,@YRES@);
 
 // PASTE FROM HERE
@@ -231,5 +231,5 @@ void main()
     // ----------------
     // PASTE UNTIL HERE
     // Output to screen     
-    output = vec4(sqrt(col * 5.),1) * smoothstep(0.,1.,min(pattern,(94.-pattern))/8.);
+    outcolor = vec4(sqrt(col * 5.),1) * smoothstep(0.,1.,min(pattern,(94.-pattern))/8.);
 }
