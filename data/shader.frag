@@ -10,14 +10,13 @@ float beat,pattern,part,partBeat,yaw,pitch,d,d2;
 vec3 col,o,r,primaryColor,secondaryColor,tertiaryColor;
 int partIndex,i;
 
-int logo[10] = int[10](0,-1,0x7C0000,0x380040F0,0xFF01F7FD,-1,0,0xD31F0320,-1,0x10001F);
+int logo[] = int[10](0,-1,0x7C0000,0x380040F0,0xFF01F7FD,-1,0,0xD31F0320,-1,0x10001F);
 
 // fogMap is the "density" of fog at point p
 // contains some some inline 3D noise function from iq (?)
 float fogMap(vec3 p2) {
-    vec3 p = p2/3,ip=floor(p);
-    p-=ip; 
-    vec3 s=vec3(7,157,113);
+    vec3 p = p2/3,ip=floor(p),s=vec3(7,157,113);
+    p-=ip;     
     vec4 h=vec4(0,s.yz,s.y+s.z)+dot(ip,s);
     p=p*p*(3-2*p); 
     h=mix(fract(sin(h)*99),fract(sin(h+s.x)*99),p.x);
@@ -38,8 +37,8 @@ float sdCappedCylinder( vec3 p, float h, float r )
 }
 
 float sdTorus( vec3 p, vec2 t )
-{
-  return length(vec2(length(p.xz)-t.x,p.y))-t.y;
+{  
+  return length(vec2(length(p.yx)-t.x,p.z))-t.y;
 }
 
 // Computes a SDF where in each 2D rectangular cell is a capped cylinder
@@ -47,14 +46,13 @@ float sdTorus( vec3 p, vec2 t )
 // cells
 float voronoiPeople( vec3 point )
 {
-    ivec2 p = ivec2(floor( point.xz ));
-    vec2  f = fract(point.xz );
+    vec2 p = floor( point.xz ), f = fract(point.xz );
 
     float res = 8;
     for(i=0; i<4; i++ )
     {
-        ivec2 b = ivec2(i%2, i/2);                        
-        res = min(sdCappedCylinder(vec3(vec2(b) - f + sin(sin(mat2(127.1,311.7,269.5,183.3)*vec2(p + b))*99+syncs[1])*.5+.5,point.y),.05,.7)-.05,res);        
+        vec2 b = vec2(i%2, i/2);                        
+        res = min(sdCappedCylinder(vec3(b - f + sin(sin(mat2(12,31,23,19)*(p + b))*99+syncs[1])*.5+.5,point.y),.05,.7)-.05,res);        
     }
 
     return res;
@@ -77,13 +75,13 @@ vec3 screen(vec2 p) {
 
 // SDF for the light rigs hanging from the ceiling. Kept as its own function as it modifies p
 float lightRigs(vec3 p) {
-    float dist = sdTorus(p.yzx+vec3(0,-20,0),vec2(15,1));
+    float dist = sdTorus(p-vec3(0,0,20),vec2(15,1));
     p.x = mod(p.x,30)-15;    
     p.z -= 5;
     p.z = max(mod(-p.z,10),p.z)-5;        
-    dist = min(min(min(dist,sdBox(p-vec3(2.7,33,0),vec3(.02,20,.02))),sdBox(p-vec3(-2.7,33,0),vec3(.02,20,.02))),min(dist,sdTorus(p.yzx+vec3(-10,0,0),vec2(3.8,.2))));
-    p.z = max(mod(p.z,10),p.z)-5;            
-    return min(dist,sdBox(p.xyz+vec3(0,-20,0),vec3(20,.2,.2)));
+    dist = min(min(min(dist,sdBox(p-vec3(2.7,33,0),vec3(.02,20,.02))),sdBox(p-vec3(-2.7,33,0),vec3(.02,20,.02))),min(dist,sdTorus(p+vec3(0,-10,0),vec2(3.8,.2))));
+    p.z = mod(p.z,10)-5;            
+    return min(dist,sdBox(p-vec3(0,20,0),vec3(20,.2,.2)));
 }
 
 // SDF for the stage.
@@ -109,7 +107,7 @@ void light(vec3 pos,vec3 dir,vec3 color, float a,float b, float c,float x) {
 void main()
 {  
     // KEEP THIS    
-    r = normalize(vec3((2*gl_FragCoord.xy-iResolution.xy)/iResolution.y,1));
+    r = normalize(vec3((2*gl_FragCoord.xy-iResolution)/iResolution.y,1));
     
     // PASTE FROM HERE
     // ---------------
@@ -226,19 +224,21 @@ void main()
                 
     for (i = -20;i < 21;i++) {             
         // round lightrigs hanging from the ceiling
-        float rig = (int((partIndex>7&&partIndex<40?beat:3)))%4-2;
+        // pitch = rig number, cycling with the beat
+        pitch = int((partIndex>7&&partIndex<40?beat:3))%4-2;
         vec3 dir = vec3(cos((i+.5)*.314),sin((i+.5)*.314),0);
-        vec3 pos = dir * 4 + vec3(15-((i+20)/20)*30,10,rig*10);                                   
-        dir.z = 2-4*mod(rig,2);
+        vec3 pos = dir * 4 + vec3(15-((i+20)/20)*30,10,pitch*10);                                   
+        dir.z = 2-4*mod(pitch,2);
         dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15 + (partIndex >= 20 && partIndex < 28 ? sin(vec2(i,i+9) + beat) : vec2(0));                                   
         light(pos,dir,secondaryColor,50,40,1,3);
 
         // front lights
-        float angle = i*.07;  
+        // pitch = angle of the light (just reusing variables)
+        pitch = i*.07;  
         light(
-            vec3(sin(angle),cos(angle),0)*15+vec3(0,0,19),
-            vec3(sin(angle),cos(angle),0)+vec3(0,.5,-2),
-            primaryColor * (syncs[5]+(part > 28 && part < 32?1+sin(part-angle):0))+syncs[2],
+            vec3(sin(pitch),cos(pitch),0)*15+vec3(0,0,19),
+            vec3(sin(pitch),cos(pitch),0)+vec3(0,.5,-2),
+            primaryColor * (syncs[5]+(part > 28 && part < 32?1+sin(part-pitch):0))+syncs[2],
             40,30,1,3);
         
         // ceiling lights         
