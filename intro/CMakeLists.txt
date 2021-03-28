@@ -1,6 +1,7 @@
 option(WINDOW "Define WINDOW macro, showing the intro in a small window instead of full screen" OFF)
 option(MINIFY_SHADERS "Use shader_minified minified shaders instead of hand-tuned ones" OFF)
 option(OPENGL_DEBUG "Show OpenGL errors in a message box" OFF)
+option(VALIDATE_SHADERS "Validate shaders using glslangValidator" ON)
 set(COMPRESS_LEVEL "medium" CACHE STRING "Crinkler compression level: off, light, medium, heavy")
 set_property(CACHE COMPRESS_LEVEL PROPERTY STRINGS OFF LIGHT MEDIUM HEAVY)
 if (NOT XRES)
@@ -110,3 +111,16 @@ else()
 endif()
 
 set_target_properties(intro PROPERTIES OUTPUT_NAME ${exename})
+
+if (VALIDATE_SHADERS)
+    find_program(GLSLANGVALIDATOR NAMES glslangValidator)
+    if (NOT VALIDATE_SHADERS)
+        message(WARNING "glslangValidator not found. Cannot validate shaders. Get glslangValidator from: https://github.com/KhronosGroup/glslang")            
+        set(VALIDATE_SHADERS OFF)
+    endif()
+endif()
+
+if (VALIDATE_SHADERS)
+    add_custom_command(TARGET intro POST_BUILD
+        COMMAND ${GLSLANGVALIDATOR} ${CMAKE_CURRENT_BINARY_DIR}/${SHADER_CONFIGURED_FRAG})
+endif()
