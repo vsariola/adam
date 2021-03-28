@@ -1,3 +1,6 @@
+// SYNC_DELAY is the offset added to MMTime.u.sample to find out corresponding sync
+// Note that this is quite large: e.g. 16384 sampels / (44100 samples per sec) = 370 ms!
+// But that's about correct in my experience to get kicks land on right time.
 #define SYNC_DELAY 16384 // should be power of 2
 
 // minify windows.h
@@ -10,6 +13,8 @@
 #include <mmreg.h>
 #include <GL/gl.h>
 
+// Defining OPENGL_DEBUG makes the CHECK_ERRORS() macro show the error code in messagebox.
+// Without the macro, CHECK_ERRORS() is a nop.
 #include "debug.h"
 
 #include "glext.h"
@@ -60,6 +65,7 @@ static WAVEHDR WaveHDR = {
 	(LPSTR)sointu_buffer, SU_BUFFER_LENGTH * sizeof(SUsample), 0, 0, 0, 0, 0, 0
 };
 
+#pragma data_seg(".mmtime")
 static MMTIME MMTime = { TIME_SAMPLES, 0 };
 
 #pragma data_seg(".pids")
