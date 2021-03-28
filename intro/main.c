@@ -64,8 +64,6 @@ static WAVEFORMATEX WaveFMT =
 static WAVEHDR WaveHDR = {
 	(LPSTR)sointu_buffer, SU_BUFFER_LENGTH * sizeof(SUsample), 0, 0, 0, 0, 0, 0
 };
-
-#pragma data_seg(".mmtime")
 static MMTIME MMTime = { TIME_SAMPLES, 0 };
 
 #pragma data_seg(".pids")
