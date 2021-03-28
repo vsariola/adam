@@ -79,7 +79,7 @@ float lightRigs(vec3 p) {
     p.x = mod(p.x,30)-15;    
     p.z -= 5;
     p.z = max(mod(-p.z,10),p.z)-5;        
-    dist = min(min(min(dist,sdBox(p-vec3(2.7,33,0),vec3(.02,20,.02))),sdBox(p-vec3(-2.7,33,0),vec3(.02,20,.02))),min(dist,sdTorus(p+vec3(0,-10,0),vec2(3.8,.2))));
+    dist = min(min(min(dist,sdBox(p-vec3(2.7,33,0),vec3(.02,20,.02))),sdBox(p-vec3(-2.7,33,0),vec3(.02,20,.02))),min(dist,sdTorus(p-vec3(0,10,0),vec2(3.8,.2))));
     p.z = mod(p.z,10)-5;            
     return min(dist,sdBox(p-vec3(0,20,0),vec3(20,.2,.2)));
 }
