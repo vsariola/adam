@@ -43,7 +43,7 @@ float voronoiPeople( vec3 point )
     ivec2 p = ivec2(floor( point.xz ));
     vec2  f = fract(point.xz );
 
-    float res = 8.;
+    float res = 8;
     for(i=0; i<4; i++ )
     {
         ivec2 b = ivec2(i%2, i/2);                        
