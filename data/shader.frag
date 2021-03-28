@@ -10,6 +10,8 @@ float beat,pattern,part,partBeat,yaw,pitch,d,d2;
 vec3 col,o,r,primaryColor,secondaryColor,tertiaryColor;
 int partIndex,i;
 
+// fogMap is the "density" of fog at point p
+// contains some some inline 3D noise function from iq (?)
 float fogMap(vec3 p2) {
     vec3 p = p2/3,ip=floor(p);
     p-=ip; 
@@ -21,7 +23,7 @@ float fogMap(vec3 p2) {
     return mix(h.x,h.y,p.z)*15/(p2.y+15);
 }
 
-// iq... I think
+// SDF functions from iq's tutorials
 float sdBox( vec3 p, vec3 b ) {
   p = abs(p) - b;
   return length(max(p,0)) + min(max(p.x,max(p.y,p.z)),0);
@@ -38,6 +40,9 @@ float sdTorus( vec3 p, vec2 t )
   return length(vec2(length(p.xz)-t.x,p.y))-t.y;
 }
 
+// Computes a SDF where in each 2D rectangular cell is a capped cylinder
+// standing at a random point. The distance is computed to the four nearest
+// cells
 float voronoiPeople( vec3 point )
 {
     ivec2 p = ivec2(floor( point.xz ));
@@ -53,18 +58,21 @@ float voronoiPeople( vec3 point )
     return res;
 }
 
+
+// Returns the color at a 2D point of the screen in the front stage
 vec3 screen(vec2 p) {  
     p.y -= 10;
     p.x = abs(p.x);
     return smoothstep(0,2,min(25-p.x,11-abs(p.y)))
       * ((part < 40
-            ? int(p.x)&int(beat+.5)%5+int(p.y)&(int(beat))%7
-            : sdCappedCylinder(vec3(0,p.x-p.y*.8,p.y+.5),0,0)<4
+            ? int(p.x)&int(beat+.5)%5+int(p.y)&(int(beat))%7 // the rectangular modulo pattern
+            : sdCappedCylinder(vec3(0,p.x-p.y*.8,p.y+.5),0,0)<4 // heart
                 ? 3
                 : 0
          )*secondaryColor*syncs[1]+syncs[3]*10);
 }
 
+// SDF for the light rigs hanging from the ceiling. Kept as its own function as it modifies p
 float lightRigs(vec3 p) {
     float dist = sdTorus(p.yzx+vec3(0,-20,0),vec2(15,1));
     p.x = mod(p.x,30)-15;    
@@ -75,6 +83,7 @@ float lightRigs(vec3 p) {
     return min(dist,sdBox(p.xyz+vec3(0,-20,0),vec3(20,.2,.2)));
 }
 
+// SDF for the stage.
 float stage(vec3 p) {    
     float dist = min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4,2)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2)));
     p.x = mod(p.x,40)-20;            
@@ -108,6 +117,9 @@ void main()
     partIndex = int(part);
     
     primaryColor = vec3(1);
+    
+    // These lines quickly cycle through different parts in sync with the kick,
+    // during the final few moments of the intro.
     if (part > 4 && part < 44) {
         secondaryColor = vec3(3,.6,.75);    
         if (part > 43) {
@@ -118,7 +130,9 @@ void main()
         }
     }
 
-     if (part < 8) {
+    // Camera pitch, yaw, position and light colors chosen based
+    // on which part it is.
+    if (part < 8) {
         o = vec3(0,10,beat-55);
     } else if (part < 28 || (part > 34 && part < 40)) {    
         primaryColor = part < 20 ? vec3(.3,1,3)*syncs[1] : part < 28 ? vec3(2,.3,3)*pow(1-mod(syncs[0]/2,1),2) : vec3(3,2,1)*syncs[1];  
@@ -171,14 +185,14 @@ void main()
         yaw = -1.2;
         pitch = .4;
     }
-    
-    //yaw += fogMap(o/2)*.02-.01;
-        
+
+    // Rotate camera: Euler pitch and yaw
     r.yz = mat2(cos(pitch),sin(pitch),-sin(pitch),cos(pitch)) * r.yz;    
     r.xz = mat2(cos(yaw),sin(yaw),-sin(yaw),cos(yaw)) * r.xz;           
     
     vec3 p;    
     
+    // Raymarch forward
     for (i = 0;i < 199;i++) {        
         p = o + r * d;
         vec2 w = vec2( -sdBox(vec3(p.xy-vec2(0,9.5),0),vec3(2,3,15)), abs(p.z+40) - 15);    
@@ -188,13 +202,14 @@ void main()
         }                      
         d += b * (p.y < 2?.1:1);               
     }          
-                
+    
+    // March backwards at fixed steps to add fog and screen glow
     for (float d2=d;d2>0;d2-=.5) {              
         p = o + r * d2;              
         col += ((vec3(.007)+smoothstep(0,1,40*clamp((pattern-64)/16,0,1)-abs(p.x-p.y+29))*pow(p.y/15,4)*vec3(.4,.36,.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25)) * .03 * min(d2,.5);        
     }
         
-    // lasers
+    // Lasers
     if (syncs[4] > 0)        
         for (i = 0;i < 150;i++) {    
             float angle = float(i/30-2)/1.9;              
