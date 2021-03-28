@@ -102,6 +102,19 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": []
+    },
+    {
+      "name": "min-heavy-2160",
+      "generator": "Ninja",
+      "configurationType": "MinSizeRel",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe",
+      "cmakeCommandArgs": "-DMINIFY_SHADERS=ON -DCOMPRESS_LEVEL=HEAVY -DXRES=3840 -DYRES=2160 trace-source=CMakeLists.txt",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": []
     }
   ]
 }
