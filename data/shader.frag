@@ -136,7 +136,7 @@ void main()
     if (part < 8) {
         o = vec3(0,10,beat-55);
     } else if (part < 28 || (part > 34 && part < 40)) {    
-        primaryColor = part < 20 ? vec3(.3,1,3)*syncs[1] : part < 28 ? vec3(2,.3,3)*pow(1-mod(syncs[0]/2,1),2) : vec3(3,2,1)*syncs[1];  
+        primaryColor = part < 20 ? vec3(.3,1,3)*syncs[1] : part < 28 ? vec3(3,.1,.2)*pow(1-mod(syncs[0]/2,1),2) : vec3(3,2,1)*syncs[1];  
         part = mod(part,8);
         if (part < 1) {
             o = vec3(-25,15,partBeat*4-21);  
