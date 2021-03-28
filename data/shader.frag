@@ -187,8 +187,8 @@ void main()
     }
 
     // Rotate camera: Euler pitch and yaw
-    r.yz = mat2(cos(pitch),sin(pitch),-sin(pitch),cos(pitch)) * r.yz;    
-    r.xz = mat2(cos(yaw),sin(yaw),-sin(yaw),cos(yaw)) * r.xz;           
+    r.yz *= mat2(cos(pitch),-sin(pitch),sin(pitch),cos(pitch));    
+    r.xz *= mat2(cos(yaw),-sin(yaw),sin(yaw),cos(yaw));           
     
     vec3 p;    
     
