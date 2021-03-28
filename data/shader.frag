@@ -212,21 +212,21 @@ void main()
     // Lasers
     if (syncs[4] > 0)        
         for (i = 0;i < 150;i++) {    
-            float angle = float(i/30-2)/1.9;              
-            light(vec3(sin(angle),cos(angle),0)*15+vec3(0,0,19),vec3(sin(float(i)+beat*1000),.1,-2),vec3(.2,1,.1),.5,50,3,0);
+            float angle = (i/30-2)/1.9;              
+            light(vec3(sin(angle),cos(angle),0)*15+vec3(0,0,19),vec3(sin(i+beat*1000),.1,-2),vec3(.2,1,.1),.5,50,3,0);
         }           
                 
     for (i = -20;i < 21;i++) {             
         // round lightrigs hanging from the ceiling
         float rig = (int((partIndex>7&&partIndex<40?beat:3)))%4-2;
-        vec3 dir = vec3(cos((float(i)+.5)*.314),sin((float(i)+.5)*.314),0);
-        vec3 pos = dir * 4 + vec3(15-float((i+20)/20)*30,10,rig*10);                                   
+        vec3 dir = vec3(cos((i+.5)*.314),sin((i+.5)*.314),0);
+        vec3 pos = dir * 4 + vec3(15-((i+20)/20)*30,10,rig*10);                                   
         dir.z = 2-4*mod(rig,2);
-        dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15 + (partIndex >= 20 && partIndex < 28 ? sin(vec2(float(i),float(i+9)) + beat) : vec2(0));                                   
+        dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15 + (partIndex >= 20 && partIndex < 28 ? sin(vec2(i,i+9) + beat) : vec2(0));                                   
         light(pos,dir,secondaryColor,50,40,1,3);
 
         // front lights
-        float angle = float(i)*.07;  
+        float angle = i*.07;  
         light(
             vec3(sin(angle),cos(angle),0)*15+vec3(0,0,19),
             vec3(sin(angle),cos(angle),0)+vec3(0,.5,-2),
@@ -235,9 +235,9 @@ void main()
         
         // ceiling lights         
         light(
-            vec3(float(i),20,-15 + (int(pattern)+i/4)%3*10),
-            vec3(float(i)*.1,-3,
-            sin(beat+float(i*(partIndex >= 20 && partIndex < 28 ? 10 : 1))*.2)),
+            vec3(i,20,-15 + (int(pattern)+i/4)%3*10),
+            vec3(i*.1,-3,
+            sin(beat+i*(partIndex >= 20 && partIndex < 28 ? 10 : 1)*.2)),
             tertiaryColor,
             150,30,1,4);
     }   
