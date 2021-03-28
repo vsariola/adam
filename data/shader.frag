@@ -10,6 +10,8 @@ float beat,pattern,part,partBeat,yaw,pitch,d,d2;
 vec3 col,o,r,primaryColor,secondaryColor,tertiaryColor;
 int partIndex,i;
 
+int logo[10] = int[10](0,-1,0x7C0000,0x380040F0,0xFF01F7FD,-1,0,0xD31F0320,-1,0x10001F);
+
 // fogMap is the "density" of fog at point p
 // contains some some inline 3D noise function from iq (?)
 float fogMap(vec3 p2) {
@@ -62,13 +64,14 @@ float voronoiPeople( vec3 point )
 // Returns the color at a 2D point of the screen in the front stage
 vec3 screen(vec2 p) {  
     p.y -= 10;
+    i = int(length(p*2));   
+    int a = 1 << int(atan(p.y,p.x)*5.09);
     p.x = abs(p.x);
     return smoothstep(0,2,min(25-p.x,11-abs(p.y)))
-      * ((part < 40
-            ? int(p.x)&int(beat+.5)%5+int(p.y)&(int(beat))%7 // the rectangular modulo pattern
-            : sdCappedCylinder(vec3(0,p.x-p.y*.8,p.y+.5),0,0)<4 // heart
-                ? 3
-                : 0
+      * ((part < 40 ? int(p.x)&int(beat+.5)%5+int(p.y)&(int(beat))%7 : // the rectangular modulo pattern
+          part < 41 ? sdCappedCylinder(vec3(0,p.x-p.y*.8,p.y+.5),0,0)<4 ? 3 : 0 : // heart
+          i < 10 ? (logo[i]&a)!=0 ? 3 : 0 :                
+          0
          )*secondaryColor*syncs[1]+syncs[3]*10);
 }
 
