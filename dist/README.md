@@ -4,7 +4,12 @@ A 4k intro written by pestis / bC!. `adam.exe` is the official 1080p version
 submitted to the competition, everything else in the directory can be deleted
 for the competition.
 
-`adam_720.exe` is the 720p version, the only version my shitty laptop can run.
+`adam-720.exe` is the 1280 x 720 version, the only version my shitty laptop can
+run.
+
+`adam-2160.exe` is the 3180 x 2160 version; I don't know if it's actually
+possible to run that version smoothly on any GPU, but I still compiled it for
+you so you can try.
 
 Source code: https://github.com/vsariola/adam
 
@@ -46,7 +51,10 @@ the shader and had Sointu sending sync data to that program using RPC. Still,
 watching it from the beginning to the end :)
 [Shader-minifier](https://github.com/laurentlb/Shader_Minifier) and
 [Crinkler](https://github.com/runestubbe/Crinkler) were used, automagically
-using CMake.
+using CMake. Pretty late I also started validating the shaders using
+[glslangValidator](https://github.com/KhronosGroup/glslang) during builds, to
+make sure that I am not doing anything against the spec in the shader. Still, I
+can only pray it looks ok on ATI cards; I don't have one to test.
 
 I had implemented tons of new features in Sointu, but could not use all of them,
 as they would never fit in a 4k. In this intro, following new stuff since 4klang
