@@ -206,12 +206,17 @@ void main()
         d += b * (p.y < 2?.1:1);               
     }          
     
+
+    // Reuse pitch and yaw variables, here:
+    // pitch = distance along ray
+    // yaw = step size
     // March backwards at fixed steps to add fog and screen glow
-    for (float d2=d;d2>0;d2-=.5) {              
-        p = o + r * d2;              
-        col += ((vec3(.007)+smoothstep(0,1,40*clamp((pattern-64)/16,0,1)-abs(p.x-p.y+29))*pow(p.y/15,4)*vec3(.4,.36,.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25)) * .03 * min(d2,.5);        
-    }
-        
+    for (pitch=d;pitch>0;pitch-=yaw) {   
+        yaw = .5-exp((p.z-25)*.3)*.4; // make the step size a little smaller near the screen
+        p = o + r * pitch;              
+        col += ((vec3(.007)+smoothstep(0,1,40*clamp((pattern-64)/16,0,1)-abs(p.x-p.y+29))*pow(p.y/15,4)*vec3(.4,.36,.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25)) * .03 * min(pitch,yaw);        
+    }       
+
     // Lasers
     if (syncs[4] > 0)        
         for (i = 0;i < 150;i++) {    
