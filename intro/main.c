@@ -121,7 +121,7 @@ void entrypoint(void)
 
 		waveOutGetPosition(hWaveOut, &MMTime, sizeof(MMTIME));
 		
-		((PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv"))(0, 16, &syncBuf[((MMTime.u.sample + SYNC_DELAY) >> 8) * SU_NUMSYNCS]);
+		((PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv"))(0, 8, &syncBuf[((MMTime.u.sample + SYNC_DELAY) >> 8) * SU_NUMSYNCS]);
 		CHECK_ERRORS();
 	
 		glRects(-1, -1, 1, 1);

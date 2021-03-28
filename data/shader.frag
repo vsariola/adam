@@ -1,6 +1,6 @@
 #version 330
 
-uniform float syncs[16];
+uniform float syncs[8];
 out vec4 outcolor;
 vec2 iResolution = vec2(@XRES@,@YRES@);
 
