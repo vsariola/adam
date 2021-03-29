@@ -408,13 +408,13 @@ patch:
       units:
         - type: envelope
           id: 133
-          parameters: {attack: 0, decay: 0, gain: 12, release: 0, stereo: 1, sustain: 128}
+          parameters: {attack: 64, decay: 0, gain: 128, release: 64, stereo: 1, sustain: 128}
         - type: sync
           id: 1103
           parameters: {}
         - type: oscillator
           id: 134
-          parameters: {color: 1, detune: 0, gain: 128, phase: 0, shape: 64, stereo: 1, transpose: 126, type: 1, unison: 3}
+          parameters: {color: 1, detune: 0, gain: 12, phase: 0, shape: 64, stereo: 1, transpose: 126, type: 1, unison: 3}
         - type: mulp
           id: 135
           parameters: {stereo: 1}
@@ -428,7 +428,7 @@ patch:
           parameters: {}
         - type: envelope
           id: 141
-          parameters: {attack: 70, decay: 0, gain: 128, release: 0, stereo: 0, sustain: 128}
+          parameters: {attack: 70, decay: 0, gain: 128, release: 128, stereo: 0, sustain: 128}
         - type: send
           id: 142
           parameters: {amount: 52, port: 0, sendpop: 1, stereo: 0, target: 134, unit: 0, voice: 0}
