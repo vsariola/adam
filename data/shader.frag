@@ -201,7 +201,7 @@ void main()
         if (b < .01 || d > 70) {                
             break;
         }                      
-        d += b * (p.y < 2?.1:1);               
+        d += b * (p.y < 2?.1:1.);               
     }          
     
 
@@ -225,7 +225,7 @@ void main()
     for (i = -20;i < 21;i++) {             
         // round lightrigs hanging from the ceiling
         // pitch = rig number, cycling with the beat
-        pitch = int((partIndex>7&&partIndex<40?beat:3))%4-2;
+        pitch = int((partIndex>7&&partIndex<40?beat:3.))%4-2;
         vec3 dir = vec3(cos((i+.5)*.314),sin((i+.5)*.314),0);
         vec3 pos = dir * 4 + vec3(15-((i+20)/20)*30,10,pitch*10);                                   
         dir.z = 2-4*mod(pitch,2);
@@ -238,7 +238,7 @@ void main()
         light(
             vec3(sin(pitch),cos(pitch),0)*15+vec3(0,0,19),
             vec3(sin(pitch),cos(pitch),0)+vec3(0,.5,-2),
-            primaryColor * (syncs[5]+(part > 28 && part < 32?1+sin(part-pitch):0))+syncs[2],
+            primaryColor * (syncs[5]+(part > 28 && part < 32?1+sin(part-pitch):0.))+syncs[2],
             40,30,1,3);
         
         // ceiling lights         
