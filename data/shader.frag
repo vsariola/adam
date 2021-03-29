@@ -55,6 +55,17 @@ vec3 screen(vec2 p) {
          )*secondaryColor*syncs[1]+syncs[3]*10);
 }
 
+// SDF for the light rigs hanging from the ceiling. Kept as its own function as it modifies p
+float lightRigs(vec3 p) {
+    float dist = sdTorus(p-vec3(0,0,20),vec2(15,1));
+    p.x = mod(p.x,30)-15;    
+    p.z -= 5;
+    p.z = max(mod(-p.z,10),p.z)-5;        
+    dist = min(min(min(dist,sdBox(p-vec3(2.7,33,0),vec3(.02,20,.02))),sdBox(p-vec3(-2.7,33,0),vec3(.02,20,.02))),min(dist,sdTorus(p-vec3(0,10,0),vec2(3.8,.2))));
+    p.z = mod(p.z,10)-5;            
+    return min(dist,sdBox(p-vec3(0,20,0),vec3(20,.2,.2)));
+}
+
 // Calculates the distance from a ray (o + r*d) to a line segment between points a & b
 // also returns the solution, in case
 
@@ -157,12 +168,12 @@ void main()
     r.yz *= mat2(cos(yy),-sin(yy),sin(yy),cos(yy));    
     r.xz *= mat2(cos(xx),-sin(xx),sin(xx),cos(xx));           
     
-    vec3 p,p2;    
+    vec3 p;    
     
     // Raymarch forward, here:
     // yy = signed distance
     for (i = 0;i < 199;i++) {        
-        p2 = p = o + r * d;
+        p = o + r * d;
         vec2 w = vec2( -sdBox(vec3(p.xy-vec2(0,9.5),0),vec3(2,3,15)), abs(p.z+40) - 15);    
         yy = min(
                 min(
@@ -174,21 +185,15 @@ void main()
                             ),
                             p.y
                         ),
-                        sdBox(p-vec3(0,0,23),vec3(200,2,5))
+                        lightRigs(p)
                     ),
-                    sdTorus(p-vec3(0,0,20),vec2(15,1))
-                ),
+                    sdBox(p-vec3(0,0,23),vec3(200,2,5))
+                ),                            
                 max(
                     sdCappedCylinder(p.xzy-vec3(0,24,2),4,2)+.2*sin(p.y),
                     -sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2)
                 )            
-            );          
-        p2.x = mod(p2.x,30)-15;    
-        p2.z -= 5;
-        p2.z = max(mod(-p2.z,10),p2.z)-5;        
-        yy = min(min(min(yy,sdBox(p2-vec3(2.7,33,0),vec3(.02,20,.02))),sdBox(p2-vec3(-2.7,33,0),vec3(.02,20,.02))),min(yy,sdTorus(p2-vec3(0,10,0),vec2(3.8,.2))));
-        p2.z = mod(p2.z,10)-5;            
-        yy = min(yy,sdBox(p2-vec3(0,20,0),vec3(20,.2,.2)));
+            ); 
         if (p.y < 1) {
             // Computes a SDF where in each 2D rectangular cell is a capped cylinder
             // standing at a random point. The distance is computed to the four nearest
