@@ -6,9 +6,9 @@ vec2 iResolution = vec2(@XRES@,@YRES@);
 
 // PASTE FROM HERE
 // ---------------
-float beat,pattern,part,partBeat,yaw,pitch,d,d2;
+float beat,pattern,part,partBeat,xx,yy,d;
 vec3 col,o,r,primaryColor,secondaryColor,tertiaryColor;
-int partIndex,i;
+int partIndex,i,j;
 
 int logo[] = int[10](0,-1,0x7C0000,0x380040F0,0xFF01F7FD,-1,0,0xD31F0320,-1,0x10001F);
 
@@ -55,17 +55,6 @@ vec3 screen(vec2 p) {
          )*secondaryColor*syncs[1]+syncs[3]*10);
 }
 
-// SDF for the light rigs hanging from the ceiling. Kept as its own function as it modifies p
-float lightRigs(vec3 p) {
-    float dist = sdTorus(p-vec3(0,0,20),vec2(15,1));
-    p.x = mod(p.x,30)-15;    
-    p.z -= 5;
-    p.z = max(mod(-p.z,10),p.z)-5;        
-    dist = min(min(min(dist,sdBox(p-vec3(2.7,33,0),vec3(.02,20,.02))),sdBox(p-vec3(-2.7,33,0),vec3(.02,20,.02))),min(dist,sdTorus(p-vec3(0,10,0),vec2(3.8,.2))));
-    p.z = mod(p.z,10)-5;            
-    return min(dist,sdBox(p-vec3(0,20,0),vec3(20,.2,.2)));
-}
-
 // Calculates the distance from a ray (o + r*d) to a line segment between points a & b
 // also returns the solution, in case
 
@@ -73,8 +62,8 @@ void light(vec3 pos,vec3 dir,vec3 color, float a,float b, float c,float x) {
     vec3 ba = r*d;
     vec3 uvw = inverse(mat3(ba,-dir,cross(ba,dir)))*(pos-o);  
     uvw.y = max(uvw.y,0);
-    pitch = 1+uvw.y*x;                
-    col += color*a*exp(-b*length(o+clamp(uvw.x,0,1)*ba-pos-uvw.y*dir)/pitch)/pitch/pitch/pitch*fogMap((o+uvw.y*r)*c)/sqrt(1-pow(dot(r,dir)/length(dir),2));
+    yy = 1+uvw.y*x;                
+    col += color*a*exp(-b*length(o+clamp(uvw.x,0,1)*ba-pos-uvw.y*dir)/yy)/yy/yy/yy*fogMap((o+uvw.y*r)*c)/sqrt(1-pow(dot(r,dir)/length(dir),2));
 }
 // ----------------
 // PASTE UNTIL HERE
@@ -106,8 +95,10 @@ void main()
         }
     }
 
-    // Camera pitch, yaw, position and light colors chosen based
+    // Camera yy, xx, position and light colors chosen based
     // on which part it is.
+    // xx = yaw
+    // yy = pitch
     if (part < 8) {
         o = vec3(0,10,beat-55);
     } else if (part < 28 || (part > 34 && part < 40)) {    
@@ -115,34 +106,34 @@ void main()
         part = mod(part,8);
         if (part < 1) {
             o = vec3(-25,15,partBeat*4-21);  
-            yaw = -1.1-partBeat*.05;
-            pitch = .4;
+            xx = -1.1-partBeat*.05;
+            yy = .4;
         } else if (part < 2) {
             o = vec3(15,10,partBeat*4-24);          
         } else if (part < 3) {
             o = vec3(0,4,partBeat*4-24);
-            pitch = -.7+partBeat*.05;        
+            yy = -.7+partBeat*.05;        
         } else if (part < 3.5 || (part > 7 && part < 7.5)) {
             o = vec3(-25,5,-24);
-            pitch = -.5;                
-            yaw = -.8+partBeat*.08;
+            yy = -.5;                
+            xx = -.8+partBeat*.08;
         } else if (part < 4 || part > 7) {
             o = vec3(0,10,15-partBeat);
         } else if (part < 5) {            
             o = vec3(0,22,partBeat*4-24);            
-            pitch = .7;            
+            yy = .7;            
         } else if (part < 6) {
             o = vec3(-18+partBeat*4,7+partBeat,-22); 
-            yaw = partBeat/8-.2;
-            pitch = partBeat/16-.3;
+            xx = partBeat/8-.2;
+            yy = partBeat/16-.3;
         } else {
             o = vec3(-10,16,partBeat*4-20);
-            yaw = -1.5;
-            pitch = .5-partBeat/32;
+            xx = -1.5;
+            yy = .5-partBeat/32;
         }
         if (pattern>32) {
             o.x = -o.x;
-            yaw = -yaw;
+            xx = -xx;
         }        
         secondaryColor = primaryColor;
         tertiaryColor = primaryColor;
@@ -151,82 +142,107 @@ void main()
         secondaryColor = tertiaryColor;
     } else if (part < 34) {
         o = vec3(0,10,pattern-80);
-        pitch = -1.4;
+        yy = -1.4;
         secondaryColor = tertiaryColor;
     } else if (part < 44) {        
         o = vec3(0,10,327-beat);
         secondaryColor *= syncs[1];        
     } else {
         o = vec3(-25,15,pattern-97);  
-        yaw = -1.2;
-        pitch = .4;
+        xx = -1.2;
+        yy = .4;
     }
 
-    // Rotate camera: Euler pitch and yaw
-    r.yz *= mat2(cos(pitch),-sin(pitch),sin(pitch),cos(pitch));    
-    r.xz *= mat2(cos(yaw),-sin(yaw),sin(yaw),cos(yaw));           
+    // Rotate camera: Euler yy and xx
+    r.yz *= mat2(cos(yy),-sin(yy),sin(yy),cos(yy));    
+    r.xz *= mat2(cos(xx),-sin(xx),sin(xx),cos(xx));           
     
-    vec3 p;    
+    vec3 p,p2;    
     
-    // Raymarch forward
+    // Raymarch forward, here:
+    // yy = signed distance
     for (i = 0;i < 199;i++) {        
-        p = o + r * d;
+        p2 = p = o + r * d;
         vec2 w = vec2( -sdBox(vec3(p.xy-vec2(0,9.5),0),vec3(2,3,15)), abs(p.z+40) - 15);    
-        float b = min(min(min(min(min(max(w.x,w.y),0) + length(max(w,0)),-sdCappedCylinder(p+vec3(0,10,15),40,40)),p.y),lightRigs(p)),min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4,2)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2)))); 
-        p.x = mod(p.x,40)-20;            
-        b = min(b,sdBox(p-vec3(0,0,20),vec3(2,15,1)));
+        yy = min(
+                min(
+                    min(
+                        min(
+                            min(
+                                min(max(w.x,w.y),0) + length(max(w,0)),
+                                -sdCappedCylinder(p+vec3(0,10,15),40,40)
+                            ),
+                            p.y
+                        ),
+                        sdBox(p-vec3(0,0,23),vec3(200,2,5))
+                    ),
+                    sdTorus(p-vec3(0,0,20),vec2(15,1))
+                ),
+                max(
+                    sdCappedCylinder(p.xzy-vec3(0,24,2),4,2)+.2*sin(p.y),
+                    -sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2)
+                )            
+            );          
+        p2.x = mod(p2.x,30)-15;    
+        p2.z -= 5;
+        p2.z = max(mod(-p2.z,10),p2.z)-5;        
+        yy = min(min(min(yy,sdBox(p2-vec3(2.7,33,0),vec3(.02,20,.02))),sdBox(p2-vec3(-2.7,33,0),vec3(.02,20,.02))),min(yy,sdTorus(p2-vec3(0,10,0),vec2(3.8,.2))));
+        p2.z = mod(p2.z,10)-5;            
+        yy = min(yy,sdBox(p2-vec3(0,20,0),vec3(20,.2,.2)));
         if (p.y < 1) {
             // Computes a SDF where in each 2D rectangular cell is a capped cylinder
             // standing at a random point. The distance is computed to the four nearest
             // cells            
-            for(i=0; i<4; i++ )
+            for(j=0; j<4; j++ )
             {
-                vec2 z = vec2(i%2, i/2), f = fract(p.xz );                        
-                b = min(b,sdCappedCylinder(vec3(z - f + sin(sin(mat2(12,31,23,19)*(floor( p.xz ) + z))*99+syncs[1])*.5+.5,p.y),.05,.7)-.05);        
+                vec2 z = vec2(j%2, j/2), f = fract(p.xz );                        
+                yy = min(yy,sdCappedCylinder(vec3(z - f + sin(sin(mat2(12,31,23,19)*(floor( p.xz ) + z))*99+syncs[1])*.5+.5,p.y),.05,.7)-.05);        
             }    
         } else {
-            b = min(b,p.y-.7);
+            yy = min(yy,p.y-.7);
         }                
-        if (b < .01 || d > 70) {                
+        p.x = mod(p.x,40)-20;            
+        yy = min(yy,sdBox(p-vec3(0,0,20),vec3(2,15,1)));
+        if (yy < .01 || d > 70) {                
             break;
         }                      
-        d += b * (p.y < 2?.1:1.);               
+        d += yy * (p.y < 2?.1:1.);               
     }          
 
-    // Reuse pitch and yaw variables, here:
-    // pitch = distance along ray
-    // yaw = step size
+    // Reuse yy and xx variables, here:
+    // yy = distance along ray
+    // xx = step size
     // March backwards at fixed steps to add fog and screen glow
-    for (pitch=d;pitch>0;pitch-=yaw) {   
-        yaw = .5-exp((p.z-25)*.3)*.4; // make the step size a little smaller near the screen
-        p = o + r * pitch;              
-        col += ((vec3(.007)+smoothstep(0,1,40*clamp((pattern-64)/16,0,1)-abs(p.x-p.y+29))*pow(p.y/15,4)*vec3(.4,.36,.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25)) * .03 * min(pitch,yaw);        
+    for (yy=d;yy>0;yy-=xx) {   
+        xx = .5-exp((p.z-25)*.3)*.4; // make the step size a little smaller near the screen
+        p = o + r * yy;              
+        col += ((vec3(.007)+smoothstep(0,1,40*clamp((pattern-64)/16,0,1)-abs(p.x-p.y+29))*pow(p.y/15,4)*vec3(.4,.36,.3) - col) * fogMap(p)+ screen(p.xy)*exp(p.z-25)) * .03 * min(yy,xx);        
     }       
 
     // Lasers
     if (syncs[4] > 0)        
         for (i = 0;i < 150;i++) {    
-            yaw = (i/30-2)/1.9;              
-            light(vec3(sin(yaw),cos(yaw),0)*15+vec3(0,0,19),vec3(sin(i+beat*1000),.1,-2),vec3(.2,1,.1)*syncs[4],.5,50,3,0);
+            xx = (i/30-2)/1.9;              
+            light(vec3(sin(xx),cos(xx),0)*15+vec3(0,0,19),vec3(sin(i+beat*1000),.1,-2),vec3(.2,1,.1)*syncs[4],.5,50,3,0);
         }           
                 
     for (i = -20;i < 21;i++) {             
         // round lightrigs hanging from the ceiling
-        // yaw = rig number, cycling with the beat
-        yaw = int((partIndex>7&&partIndex<40?beat:3.))%4-2;
+        // xx = rig number, cycling with the beat
+        xx = int((partIndex>7&&partIndex<40?beat:3.))%4-2;
         vec3 dir = vec3(cos((i+.5)*.314),sin((i+.5)*.314),0);
-        vec3 pos = dir * 4 + vec3(15-((i+20)/20)*30,10,yaw*10);                                   
-        dir.z = 2-4*mod(yaw,2);
+        vec3 pos = dir * 4 + vec3(15-((i+20)/20)*30,10,xx*10);                                   
+        dir.z = 2-4*mod(xx,2);
         dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15 + (partIndex >= 20 && partIndex < 28 ? sin(vec2(i,i+9) + beat) : vec2(0));                                   
         light(pos,dir,secondaryColor,50,40,1,3);
 
         // front lights
-        // yaw = angle of the light (just reusing variables)
-        yaw = i*.07;  
+        // xx = angle of the light (just reusing variables)
+        xx = i*.07;  
         light(
-            vec3(sin(yaw),cos(yaw),0)*15+vec3(0,0,19),
-            vec3(sin(yaw),cos(yaw),0)+vec3(0,.5,-2),
-            primaryColor * (syncs[5]+(part > 28 && part < 32?1+sin(part-yaw):0.))+syncs[2],
+            vec3(sin(xx),cos(xx),0)*15+vec3(0,0,19),
+            vec3(sin(xx),cos(xx),0)+vec3(0,.5,-2),
+            primaryColor * (syncs[5]+(part > 28 && part < 32?1+sin(part-xx):0.))+syncs[2],
             40,30,1,3);
         
         // ceiling lights         
