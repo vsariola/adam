@@ -54,8 +54,8 @@ watching it from the beginning to the end :)
 using CMake. Pretty late I also started validating the shaders using
 [glslangValidator](https://github.com/KhronosGroup/glslang) during builds, to
 make sure that I am not doing anything against the spec in the shader. I also
-occasionally manually used [ATI GPU
-ShaderAnalyzer](https://gpuopen.com/archived/gpu-shaderanalyzer/) to check that
+occasionally manually used
+[ShaderAnalyzer](https://gpuopen.com/archived/gpu-shaderanalyzer/) to check that
 the shader at least theoretically compiles on ATI. Still, I can only pray it
 _looks_ ok on ATI cards; I don't have one to test.
 
