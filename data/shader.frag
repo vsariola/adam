@@ -41,24 +41,6 @@ float sdTorus( vec3 p, vec2 t )
   return length(vec2(length(p.yx)-t.x,p.z))-t.y;
 }
 
-// Computes a SDF where in each 2D rectangular cell is a capped cylinder
-// standing at a random point. The distance is computed to the four nearest
-// cells
-float voronoiPeople( vec3 point )
-{
-    vec2 p = floor( point.xz ), f = fract(point.xz );
-
-    float res = 8;
-    for(i=0; i<4; i++ )
-    {
-        vec2 b = vec2(i%2, i/2);                        
-        res = min(sdCappedCylinder(vec3(b - f + sin(sin(mat2(12,31,23,19)*(p + b))*99+syncs[1])*.5+.5,point.y),.05,.7)-.05,res);        
-    }
-
-    return res;
-}
-
-
 // Returns the color at a 2D point of the screen in the front stage
 vec3 screen(vec2 p) {  
     p.y -= 10;
@@ -84,13 +66,6 @@ float lightRigs(vec3 p) {
     return min(dist,sdBox(p-vec3(0,20,0),vec3(20,.2,.2)));
 }
 
-// SDF for the stage.
-float stage(vec3 p) {    
-    float dist = min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4,2)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2)));
-    p.x = mod(p.x,40)-20;            
-    return min(min(dist,sdBox(p-vec3(0,0,20),vec3(2,15,1))),p.y<1?voronoiPeople(p):p.y-.7);
-}
-
 // Calculates the distance from a ray (o + r*d) to a line segment between points a & b
 // also returns the solution, in case
 
@@ -98,8 +73,8 @@ void light(vec3 pos,vec3 dir,vec3 color, float a,float b, float c,float x) {
     vec3 ba = r*d;
     vec3 uvw = inverse(mat3(ba,-dir,cross(ba,dir)))*(pos-o);  
     uvw.y = max(uvw.y,0);
-    float beamwidth = 1+uvw.y*x;                
-    col += color*a*exp(-b*length(o+clamp(uvw.x,0,1)*ba-pos-uvw.y*dir)/beamwidth)/beamwidth/beamwidth/beamwidth*fogMap((o+uvw.y*r)*c)/sqrt(1-pow(dot(r,dir)/length(dir),2));
+    pitch = 1+uvw.y*x;                
+    col += color*a*exp(-b*length(o+clamp(uvw.x,0,1)*ba-pos-uvw.y*dir)/pitch)/pitch/pitch/pitch*fogMap((o+uvw.y*r)*c)/sqrt(1-pow(dot(r,dir)/length(dir),2));
 }
 // ----------------
 // PASTE UNTIL HERE
@@ -126,7 +101,7 @@ void main()
         if (part > 43) {
             part = (part-42.5)*16;
             if (part > 16) {
-                part = (part-12)*2;
+                part += part-24;
             }
         }
     }
@@ -197,13 +172,26 @@ void main()
     for (i = 0;i < 199;i++) {        
         p = o + r * d;
         vec2 w = vec2( -sdBox(vec3(p.xy-vec2(0,9.5),0),vec3(2,3,15)), abs(p.z+40) - 15);    
-        float b = min(min(min(min(min(max(w.x,w.y),0) + length(max(w,0)),-sdCappedCylinder(p+vec3(0,10,15),40,40)),p.y),lightRigs(p)),stage(p)); 
+        float b = min(min(min(min(min(max(w.x,w.y),0) + length(max(w,0)),-sdCappedCylinder(p+vec3(0,10,15),40,40)),p.y),lightRigs(p)),min(sdBox(p-vec3(0,0,23),vec3(200,2,5)),max(sdCappedCylinder(p.xzy-vec3(0,24,2),4,2)+.2*sin(p.y),-sdCappedCylinder(p.xzy-vec3(0,24,4),3.8,2)))); 
+        p.x = mod(p.x,40)-20;            
+        b = min(b,sdBox(p-vec3(0,0,20),vec3(2,15,1)));
+        if (p.y < 1) {
+            // Computes a SDF where in each 2D rectangular cell is a capped cylinder
+            // standing at a random point. The distance is computed to the four nearest
+            // cells            
+            for(i=0; i<4; i++ )
+            {
+                vec2 z = vec2(i%2, i/2), f = fract(p.xz );                        
+                b = min(b,sdCappedCylinder(vec3(z - f + sin(sin(mat2(12,31,23,19)*(floor( p.xz ) + z))*99+syncs[1])*.5+.5,p.y),.05,.7)-.05);        
+            }    
+        } else {
+            b = min(b,p.y-.7);
+        }                
         if (b < .01 || d > 70) {                
             break;
         }                      
         d += b * (p.y < 2?.1:1.);               
     }          
-    
 
     // Reuse pitch and yaw variables, here:
     // pitch = distance along ray
@@ -218,27 +206,27 @@ void main()
     // Lasers
     if (syncs[4] > 0)        
         for (i = 0;i < 150;i++) {    
-            float angle = (i/30-2)/1.9;              
-            light(vec3(sin(angle),cos(angle),0)*15+vec3(0,0,19),vec3(sin(i+beat*1000),.1,-2),vec3(.2,1,.1),.5,50,3,0);
+            yaw = (i/30-2)/1.9;              
+            light(vec3(sin(yaw),cos(yaw),0)*15+vec3(0,0,19),vec3(sin(i+beat*1000),.1,-2),vec3(.2,1,.1)*syncs[4],.5,50,3,0);
         }           
                 
     for (i = -20;i < 21;i++) {             
         // round lightrigs hanging from the ceiling
-        // pitch = rig number, cycling with the beat
-        pitch = int((partIndex>7&&partIndex<40?beat:3.))%4-2;
+        // yaw = rig number, cycling with the beat
+        yaw = int((partIndex>7&&partIndex<40?beat:3.))%4-2;
         vec3 dir = vec3(cos((i+.5)*.314),sin((i+.5)*.314),0);
-        vec3 pos = dir * 4 + vec3(15-((i+20)/20)*30,10,pitch*10);                                   
-        dir.z = 2-4*mod(pitch,2);
+        vec3 pos = dir * 4 + vec3(15-((i+20)/20)*30,10,yaw*10);                                   
+        dir.z = 2-4*mod(yaw,2);
         dir.xy += dir.yx * vec2(-1,1) * syncs[7]*15 + (partIndex >= 20 && partIndex < 28 ? sin(vec2(i,i+9) + beat) : vec2(0));                                   
         light(pos,dir,secondaryColor,50,40,1,3);
 
         // front lights
-        // pitch = angle of the light (just reusing variables)
-        pitch = i*.07;  
+        // yaw = angle of the light (just reusing variables)
+        yaw = i*.07;  
         light(
-            vec3(sin(pitch),cos(pitch),0)*15+vec3(0,0,19),
-            vec3(sin(pitch),cos(pitch),0)+vec3(0,.5,-2),
-            primaryColor * (syncs[5]+(part > 28 && part < 32?1+sin(part-pitch):0.))+syncs[2],
+            vec3(sin(yaw),cos(yaw),0)*15+vec3(0,0,19),
+            vec3(sin(yaw),cos(yaw),0)+vec3(0,.5,-2),
+            primaryColor * (syncs[5]+(part > 28 && part < 32?1+sin(part-yaw):0.))+syncs[2],
             40,30,1,3);
         
         // ceiling lights         
