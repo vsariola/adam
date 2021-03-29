@@ -53,8 +53,11 @@ watching it from the beginning to the end :)
 [Crinkler](https://github.com/runestubbe/Crinkler) were used, automagically
 using CMake. Pretty late I also started validating the shaders using
 [glslangValidator](https://github.com/KhronosGroup/glslang) during builds, to
-make sure that I am not doing anything against the spec in the shader. Still, I
-can only pray it looks ok on ATI cards; I don't have one to test.
+make sure that I am not doing anything against the spec in the shader. I also
+occasionally manually used [ATI GPU
+ShaderAnalyzer](https://gpuopen.com/archived/gpu-shaderanalyzer/) to check that
+the shader at least theoretically compiles on ATI. Still, I can only pray it
+_looks_ ok on ATI cards; I don't have one to test.
 
 I had implemented tons of new features in Sointu, but could not use all of them,
 as they would never fit in a 4k. In this intro, following new stuff since 4klang
@@ -63,7 +66,7 @@ was used:
    laugh sample is followed by a whistle sample. This reminded me of all the
    out-of-tune rave whistles, so what was originally a bug is now a feature :)
 2) Compressor. The kick sidechain compresses (ducks) everything else. There's a
-   slow level-equalizing compressor and a peak limiter compressors in the main
+   slow level-equalizing compressor and a peak limiter compressor in the main
    signal.
 3) Unison oscillators. There's 24 oscillators in that super saw that you hear
    during "Katto auki!".
@@ -78,12 +81,12 @@ was used:
 
 ## Kudos
 
-Gopher & pOWL / Alcatraz - For 4klang <3 <3 <3
-Noby / Prismbeings - For Leviathan
-Iq / RGBA - For the various raymarching / SDF tutorials
-Mentor / TBC & Blueberry / Loonies - For Crinkler
-LLB / Ctrl-Alt-Test - For shader-minifier
-Apollo / bC! - For first version of the Sointu GUI
-Distance / TPOLM - For testing Sointu, bug reports & feature requests
+- Gopher & pOWL / Alcatraz - For 4klang <3 <3 <3
+- noby / Prismbeings - For Leviathan & reading the GLSL specs for me
+- Iq / RGBA - For the various raymarching / SDF tutorials
+- Mentor / TBC & Blueberry / Loonies - For Crinkler
+- LLB / Ctrl-Alt-Test - For shader-minifier
+- Apollo / bC! - For first version of the Sointu GUI
+- Distance / TPOLM - For testing Sointu, bug reports & feature requests
 
 PLUR
