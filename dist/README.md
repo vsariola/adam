@@ -13,7 +13,7 @@ you so you can try.
 
 Source code: https://github.com/vsariola/adam
 
-Full screen capture: TBD
+Youtube: https://youtu.be/ofY9cYHgwF4
 
 Tested on Windows 10 Enterprise - 64bit.
 
