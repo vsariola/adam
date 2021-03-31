@@ -126,6 +126,13 @@ float lightRigs(vec3 p) {
 // light source, and uvw.x to [0,1] range as we want to stay at the segment from
 // camera to where the raymarcher hit the object. The distance between these two
 // points is the closest distance that the ray passes to the segment.
+//
+// a,b,c,x just control the brightness, width, fog frequency and distance based
+// spread of the light, respectively.
+//
+// Note that we could've passed just a*color instead of color; the end result
+// would've been similar, but that actually compressed worse so I kept it as it
+// is.
 void light(vec3 pos,vec3 dir,vec3 color, float a,float b, float c,float x) {
     vec3 ba = r*d;
     vec3 uvw = inverse(mat3(ba,-dir,cross(ba,dir)))*(pos-o);
