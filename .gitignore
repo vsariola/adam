@@ -16,4 +16,5 @@
 
 
 out/
+build/
 .vs/
